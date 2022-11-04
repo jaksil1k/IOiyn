@@ -4,6 +4,7 @@ import (
 	"IOiyn.kz/internal/models"
 	"database/sql"
 	"flag"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"os"
@@ -12,12 +13,12 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	snippets *models.GameModel
+	games    *models.GameModel
 }
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "", "")
+	dsn := flag.String("dsn", "root:password@/game?multiStatements=true", "MySQL data source name")
 
 	flag.Parse()
 
@@ -34,8 +35,11 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		snippets: &models.GameModel{DB: db},
+		games:    &models.GameModel{DB: db},
 	}
+
+	app.games.CreateDB()
+	defer app.games.DropDB()
 
 	mux := http.NewServeMux()
 
@@ -56,12 +60,12 @@ func main() {
 }
 
 func openDB(dsn string) (*sql.DB, error) {
-	/*db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
 	if err = db.Ping(); err != nil {
 		return nil, err
-	}*/
-	return nil, nil
+	}
+	return db, nil
 }

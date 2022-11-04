@@ -11,7 +11,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	w.Write([]byte("Hello from Snippetbox"))
+	w.Write([]byte("Hello from IOiyn"))
 }
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
