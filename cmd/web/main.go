@@ -18,7 +18,7 @@ type application struct {
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "root:password@/game?multiStatements=true", "MySQL data source name")
+	dsn := flag.String("dsn", "root:password@/game?multiStatements=true&parseTime=true", "MySQL data source name")
 
 	flag.Parse()
 
@@ -38,8 +38,12 @@ func main() {
 		games:    &models.GameModel{DB: db},
 	}
 
-	app.games.CreateDB()
-	defer app.games.DropDB()
+	err = app.games.DropTablesInDB()
+	if err != nil {
+		return
+	}
+	app.games.CreateTablesInDB()
+	defer app.games.DropTablesInDB()
 
 	mux := http.NewServeMux()
 
