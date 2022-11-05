@@ -1,5 +1,9 @@
 # IOiyn
-if you are not Zaur or Alikhan, then it makes no sense for you to read this.
+before starting db run this sql statement
+
+createSchemaQuery := "create database if not exists game CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+
+if you are not Zaur or Alikhan, then it makes no sense for you to read text below.
 
 будет Main page где есть последние игры, новые игры, самые популярные или "рейтинговые" и бесплатные игры как в магазин в стиме.
 
