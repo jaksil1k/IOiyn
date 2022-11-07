@@ -9,10 +9,11 @@ import (
 type Game struct {
 	ID          int
 	CreatedBy   int
+	AuthorName  string
 	Name        string
 	Description string
 	Cost        int
-	releaseYear time.Time
+	ReleaseDate time.Time
 }
 
 type GameModel struct {
@@ -45,7 +46,7 @@ func (m *GameModel) GetById(id int) (*Game, error) {
 
 	g := &Game{}
 
-	err := row.Scan(&g.ID, &g.CreatedBy, &g.Name, &g.Description, &g.Cost, &g.releaseYear)
+	err := row.Scan(&g.ID, &g.CreatedBy, &g.Name, &g.Description, &g.Cost, &g.ReleaseDate)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -59,5 +60,66 @@ func (m *GameModel) GetById(id int) (*Game, error) {
 }
 
 func (m *GameModel) Latest() ([]*Game, error) {
-	return nil, nil
+	stmt := `SELECT * FROM games ORDER BY game_id DESC LIMIT 10`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var games []*Game
+
+	for rows.Next() {
+		game := &Game{}
+		err := rows.Scan(&game.ID, &game.CreatedBy, &game.Name, &game.Description, &game.Cost, &game.ReleaseDate)
+		if err != nil {
+			return nil, err
+		}
+		user, err := m.GetUserById(game.CreatedBy)
+		if err != nil {
+			return nil, err
+		}
+		game.AuthorName = user.Name
+		games = append(games, game)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return games, nil
+}
+
+func (m *GameModel) GetUserById(id int) (*User, error) {
+	stmt := `SELECT * FROM users
+	WHERE user_id = ?`
+
+	row := m.DB.QueryRow(stmt, id)
+
+	u := &User{}
+
+	err := row.Scan(&u.ID, &u.Name, &u.Nickname, &u.Balance, &u.Email, &u.Password, &u.Created)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+
+	return u, nil
+}
+
+func (m *GameModel) CreateInitialGames() error {
+	_, err := m.Insert(1, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		return err
+	}
+	_, err = m.Insert(1, "cs go", "shit but not shit", 0, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,1 +1,22 @@
-тута базовый template
+{{define "base"}}
+    <!doctype html>
+    <html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+{{/*        <title>{{template "title" .}}</title>*/}}
+        <link rel='stylesheet' href='/static/css/general/main.css'>
+        <link rel='stylesheet' href='/static/css/general/reset.css'>
+        <link rel='stylesheet' href='/static/css/elements/nav.css'>
+        <link rel='stylesheet' href='/static/css/elements/footer.css'>
+        <link rel='stylesheet' href='/static/css/elements/account.css'>
+        <link rel='stylesheet' href='/static/css/elements/form-login.css'>
+        <link rel='stylesheet' href='/static/css/elements/info.css'>
+    </head>
+    <body>
+    {{template "nav" .}}
+    {{template "main" .}}
+    {{template "footer" .}}
+    <script src="/static/js/main.js" type="text/javascript"></script>
+    </body>
+    </html>
+{{end}}

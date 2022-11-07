@@ -1,0 +1,49 @@
+.account {
+  width: 100%;
+  margin: 2rem 0;
+  font-size: 2rem;
+}
+.account__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-align: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 10rem;
+}
+.account__item {
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  text-align: center;
+}
+.account div:last-child {
+  color: #EA4256;
+}
+
+.cards {
+  width: 100%;
+  margin: 2rem 0;
+  font-size: 2rem;
+}
+.cards__list {
+  text-align: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 6rem;
+}
+.cards__item {
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  text-align: center;
+}
+.cards div:last-child {
+  color: #EA4256;
+}
+
+/*# sourceMappingURL=account.css.map */

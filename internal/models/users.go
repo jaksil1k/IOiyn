@@ -11,8 +11,9 @@ type User struct {
 	Name     string
 	Nickname string
 	Balance  int
-	Email    int
+	Email    string
 	Password string
+	Created  time.Time
 }
 
 type UserModel struct {
@@ -52,7 +53,7 @@ func (m *UserModel) GetById(id int) (*User, error) {
 
 	u := &User{}
 
-	err := row.Scan(&u.ID, &u.Name, &u.Nickname, &u.Balance, &u.Email, &u.Password)
+	err := row.Scan(&u.ID, &u.Name, &u.Nickname, &u.Balance, &u.Email, &u.Password, &u.Created)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -63,4 +64,18 @@ func (m *UserModel) GetById(id int) (*User, error) {
 	}
 
 	return u, nil
+}
+
+func (m *UserModel) CreateInitialUsers() error {
+	name := "Zaur"
+	nickname := "Lagmazavr"
+	balance := 100
+	email := "zaur@gmail.com"
+	password := "password"
+	_, err := m.Insert(name, nickname, balance, email, password)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

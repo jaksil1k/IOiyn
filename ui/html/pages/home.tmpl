@@ -1,0 +1,23 @@
+{{define "main"}}
+    <h2>Latest releases</h2>
+    {{if .Games}}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Release Date</th>
+                <th>Author</th>
+                <th>Cost</th>
+            </tr>
+            {{range .Games}}
+                <tr>
+                    <td><a href='/game/view?id={{.ID}}'>{{.Name}}</a></td>
+                    <td>{{.ReleaseDate}}</td>
+                    <td>{{.AuthorName}}</td>
+                    <td>{{.Cost}}$</td>
+                </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>There's no games yet, be the first!</p>
+    {{end}}
+{{end}}

@@ -1,0 +1,140 @@
+@font-face {
+  font-family: "AtypTextBoldItalic";
+  src: local("AtypTextBoldItalic"), url("../../fonts/AtypText/AtypText-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+  font-family: "AtypTextBold";
+  src: local("AtypTextBold"), url("../../fonts/AtypText/AtypText-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextThin";
+  src: local("AtypTextThin"), url("../../fonts/AtypText/AtypText-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextItalic";
+  src: local("AtypTextItalic"), url("../../fonts/AtypText/AtypText-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: "AtypTextSemibold";
+  src: local("AtypTextSemibold"), url("../../fonts/AtypText/AtypText-Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextSemiboldItalic";
+  src: local("AtypTextSemiboldItalic"), url("../../fonts/AtypText/AtypText-SemiboldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: "AtypTextRegular";
+  src: local("AtypTextRegular"), url("../../fonts/AtypText/AtypText-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextMediumItalic";
+  src: local("AtypTextMediumItalic"), url("../../fonts/AtypText/AtypText-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: "AtypTextMedium";
+  src: local("AtypTextMedium"), url("../../fonts/AtypText/AtypText-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextLight";
+  src: local("AtypTextLight"), url("../../fonts/AtypText/AtypText-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "AtypTextLightItalic";
+  src: local("AtypTextLightItalic"), url("../../fonts/AtypText/AtypText-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+@font-face {
+  font-family: "AtypTextThinItalic";
+  src: local("AtypTextThinItalic"), url("../../fonts/AtypText/AtypText-ThinItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+}
+html {
+  font-size: 16px;
+}
+
+body {
+  background: #F6F6F6;
+  font-family: "AtypTextRegular", sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+h1 {
+  text-align: center;
+  color: #EA4256;
+  margin: 2rem 0 !important;
+}
+
+input {
+  border: 1px solid black;
+  border-radius: 5px;
+  font-size: 1rem;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border 0.5s ease;
+  padding: 0 1rem;
+}
+input:hover {
+  border: 1px solid #EA4256;
+}
+input:focus {
+  outline: 1px solid #EA4256;
+}
+input::placeholder {
+  font-size: 1rem;
+}
+input[type=submit] {
+  background: #EA4256;
+  border: 1px solid #EA4256;
+  color: #F6F6F6;
+  padding: 0.4rem 1rem;
+  width: 10rem;
+  transition: background-color 0.5s ease;
+}
+input[type=submit]:hover {
+  background: transparent;
+  border: 1px solid #EA4256;
+  color: black;
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: 25px;
+  }
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+/*# sourceMappingURL=main.css.map */

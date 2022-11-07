@@ -1,0 +1,17 @@
+.form-login {
+  text-align: left;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  width: 40%;
+}
+.form-login div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 2rem 0;
+}
+
+/*# sourceMappingURL=form-login.css.map */

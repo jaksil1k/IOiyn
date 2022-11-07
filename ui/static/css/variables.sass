@@ -1,0 +1,60 @@
+//font-size
+$fs1: 1.728rem
+$fs2: 1.44rem
+$fs3: 1.2rem
+$fs4: 1rem
+$fs5: 0.833rem
+$fs6: 0.694rem
+
+//font-weight
+$fwB: 900 //Bold
+$fwM: 500 //Medium
+$fwR: 400 //Regular
+
+//colors
+$burgundy: #EA4256
+$gray: #939393
+
+//media queries
+$xll:  1400px
+$xl:  1200px
+$lg:  1000px
+$md:  768px
+$sm:  480px
+$xs:  360px
+
+//template for centering
+%center-both
+  display: flex
+  justify-content: center
+  align-items: center
+
+@mixin center
+  display: flex
+  justify-content: center
+  align-items: center
+
+
+//template for testing
+%test-border
+  border: 1px solid red
+
+//mixin for text
+@mixin font($fs, $fw)
+  font-size: $fs
+  font-weight: $fw
+
+
+//mixin for border
+@mixin border($width, $color, $radius)
+  border: $width solid $color
+  border-radius: $radius
+
+//mixin for shadow
+@mixin text-shadow($x, $y, $radius, $color)
+  text-shadow: $x $y $radius $color
+
+//mixin for width/height
+@mixin size($w, $h)
+  width: $w
+  height: $h

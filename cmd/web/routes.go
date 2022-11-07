@@ -11,6 +11,8 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/game/view", app.gameView)
 	mux.HandleFunc("/game/create", app.gameCreate)
 	mux.HandleFunc("/game/catalogView", app.catalogView)
+	mux.HandleFunc("/user/view", app.userView)
+	mux.HandleFunc("/user/create", app.userCreate)
 
 	return mux
 }

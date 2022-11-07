@@ -4,6 +4,7 @@ import (
 	"IOiyn.kz/internal/models"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,7 +15,31 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	w.Write([]byte("Hello from IOiyn"))
+	games, err := app.games.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/partials/footer.tmpl",
+		"./ui/html/pages/home.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := &templateData{
+		Games: games,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -41,19 +66,13 @@ func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userName := "Zaur"
-	userNickname := "Lagmazavr"
-	userBalance := 100
-	userEmail := "zaur@gmail.com"
-	userPassword := "password"
-
-	userId, err := app.users.Insert(userName, userNickname, userBalance, userEmail, userPassword)
+	user, err := app.users.GetById(1)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	id, err := app.games.Insert(userId, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+	id, err := app.games.Insert(user.ID, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -79,6 +98,42 @@ func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("/user/view?id=%d", id), http.StatusSeeOther)
+}
+
+func (app *application) userView(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/partials/footer.tmpl",
+		"./ui/html/pages/userView.tmpl",
+	}
+	// Parse the template files...
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// And then execute them. Notice how we are passing in the snippet
+	// data (a models.Snippet struct) as the final parameter?
+	err = ts.ExecuteTemplate(w, "base", user)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
 }
 
 func (app *application) catalogView(w http.ResponseWriter, r *http.Request) {
