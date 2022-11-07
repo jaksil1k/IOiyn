@@ -14,6 +14,8 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	games    *models.GameModel
+	db       *models.DBModel
+	users    *models.UserModel
 }
 
 func main() {
@@ -36,14 +38,19 @@ func main() {
 		errorLog: errorLog,
 		infoLog:  infoLog,
 		games:    &models.GameModel{DB: db},
+		db:       &models.DBModel{DB: db},
+		users:    &models.UserModel{DB: db},
 	}
 
-	err = app.games.DropTablesInDB()
+	err = app.db.DropTables()
 	if err != nil {
-		return
+		errorLog.Fatal(err)
 	}
-	app.games.CreateTablesInDB()
-	defer app.games.DropTablesInDB()
+	err = app.db.CreateTables()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer app.db.DropTables()
 
 	mux := http.NewServeMux()
 
