@@ -9,11 +9,11 @@ import (
 type Game struct {
 	ID          int
 	CreatedBy   int
-	AuthorName  string
 	Name        string
 	Description string
 	Cost        int
 	ReleaseDate time.Time
+	Author      *User
 }
 
 type GameModel struct {
@@ -81,7 +81,7 @@ func (m *GameModel) Latest() ([]*Game, error) {
 		if err != nil {
 			return nil, err
 		}
-		game.AuthorName = user.Name
+		game.Author = user
 		games = append(games, game)
 	}
 

@@ -7,8 +7,18 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
 )
+
+type userCreateForm struct {
+	Name        string
+	Nickname    string
+	Email       string
+	Password    string
+	FieldErrors map[string]string
+}
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	games, err := app.games.Latest()
@@ -37,18 +47,23 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := app.users.GetById(game.CreatedBy)
+	user.Password = ""
+	game.Author = user
 	data := app.newTemplateData(r)
 	data.Game = game
+
 	app.render(w, http.StatusOK, "gameView.tmpl", data)
 }
 func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
-	user, err := app.users.GetById(1)
+	err := r.ParseForm()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	id, err := app.games.Insert(user.ID, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+	id, err := app.games.Insert(1, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -62,12 +77,46 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	name := r.PostForm.Get("name")
-	nickname := r.PostForm.Get("nickname")
-	email := r.PostForm.Get("email")
-	password := r.PostForm.Get("password")
 
-	id, err := app.users.Insert(name, nickname, 1000, email, password)
+	form := userCreateForm{
+		Name:        r.PostForm.Get("name"),
+		Nickname:    r.PostForm.Get("nickname"),
+		Email:       r.PostForm.Get("email"),
+		Password:    r.PostForm.Get("password"),
+		FieldErrors: map[string]string{},
+	}
+
+	fieldErrors := make(map[string]string)
+
+	if strings.TrimSpace(form.Name) == "" {
+		fieldErrors["name"] = "this field can not be blank"
+	} else if utf8.RuneCountInString(form.Name) > 50 {
+		fieldErrors["name"] = "this field can not be more than 50 characters long"
+	}
+
+	if strings.TrimSpace(form.Nickname) == "" {
+		fieldErrors["nickname"] = "this field can not be blank"
+	} else if utf8.RuneCountInString(form.Nickname) > 30 {
+		fieldErrors["nickname"] = "this field can not be more than 30 characters long"
+	}
+
+	if strings.TrimSpace(form.Email) == "" {
+		fieldErrors["email"] = "This field can not be blank"
+	}
+
+	if strings.TrimSpace(form.Password) == "" {
+		fieldErrors["email"] = "This field can not be blank"
+	} else if utf8.RuneCountInString(form.Password) < 8 {
+		fieldErrors["email"] = "This field can not be less than 8"
+	}
+
+	if len(fieldErrors) > 0 {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "userCreate.tmpl", data)
+	}
+
+	id, err := app.users.Insert(form.Name, form.Nickname, 1000, form.Email, form.Password)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -83,6 +132,7 @@ func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
+	data.Form = userCreateForm{}
 	app.render(w, http.StatusOK, "userCreate.tmpl", data)
 }
 
