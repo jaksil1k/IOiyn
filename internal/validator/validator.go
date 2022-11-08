@@ -40,6 +40,10 @@ func MinChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) >= n
 }
 
+func MaxInt(value int, n int) bool {
+	return value <= n
+}
+
 func PermittedInt(value int, permittedValues ...int) bool {
 	for i := range permittedValues {
 		if value == permittedValues[i] {

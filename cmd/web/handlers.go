@@ -19,6 +19,14 @@ type userCreateForm struct {
 	validator.Validator `form:"-"`
 }
 
+type gameCreateForm struct {
+	CreatedBy           int    `form:"-"`
+	Name                string `form:"name"`
+	Cost                int    `form:"cost"`
+	Description         string `form:"description"`
+	validator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	games, err := app.games.Latest()
 	if err != nil {
@@ -61,12 +69,34 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.games.Insert(1, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+	var form gameCreateForm
 
+	err = app.formDecoder.Decode(&form, r.PostForm)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "game cannot be blank")
+	form.CheckField(validator.NotBlank(form.Description), "description", "description cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 100), "name", "name cannot be more than 100 characters long")
+	form.CheckField(validator.MaxChars(form.Description, 10000), "description", "description cannot be more than 10000 characters long")
+	form.CheckField(validator.MaxInt(form.Cost, 100000), "cost", "cost cannot be more than 100000")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusOK, "gameCreate.tmpl", data)
+		return
+	}
+
+	id, err := app.games.Insert(1, form.Name, form.Description, form.Cost, time.Now())
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Game successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/game/view/%d", id), http.StatusSeeOther)
 }
 
@@ -112,6 +142,7 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
+	data.Form = gameCreateForm{}
 	app.render(w, http.StatusOK, "gameCreate.tmpl", data)
 }
 
@@ -141,11 +172,8 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash := app.sessionManager.PopString(r.Context(), "flash")
-
 	data := app.newTemplateData(r)
 	data.User = user
-	data.Flash = flash
 
 	app.render(w, http.StatusOK, "userView.tmpl", data)
 }
