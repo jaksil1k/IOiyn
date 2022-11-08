@@ -4,6 +4,7 @@ import (
 	"IOiyn.kz/internal/models"
 	"database/sql"
 	"flag"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
 	"log"
@@ -18,6 +19,7 @@ type application struct {
 	db            *models.DBModel
 	users         *models.UserModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func main() {
@@ -42,6 +44,8 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
@@ -49,6 +53,7 @@ func main() {
 		db:            &models.DBModel{DB: db},
 		users:         &models.UserModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	err = app.db.DropTables()

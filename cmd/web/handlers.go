@@ -2,22 +2,21 @@ package main
 
 import (
 	"IOiyn.kz/internal/models"
+	"IOiyn.kz/internal/validator"
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
-	"unicode/utf8"
 )
 
 type userCreateForm struct {
-	Name        string
-	Nickname    string
-	Email       string
-	Password    string
-	FieldErrors map[string]string
+	Name                string `form:"name"`
+	Nickname            string `form:"nickname"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -78,39 +77,22 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := userCreateForm{
-		Name:        r.PostForm.Get("name"),
-		Nickname:    r.PostForm.Get("nickname"),
-		Email:       r.PostForm.Get("email"),
-		Password:    r.PostForm.Get("password"),
-		FieldErrors: map[string]string{},
+	var form userCreateForm
+
+	err = app.formDecoder.Decode(&form, r.PostForm)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
 	}
 
-	fieldErrors := make(map[string]string)
+	form.CheckField(validator.NotBlank(form.Name), "name", "This cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 50), "name", "This field cannot be more than 50 character long")
+	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "This cannot be blank")
+	form.CheckField(validator.MaxChars(form.Nickname, 30), "nickname", "This field cannot be more than 50 character long")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "password", "This cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This cannot be less than 8")
 
-	if strings.TrimSpace(form.Name) == "" {
-		fieldErrors["name"] = "this field can not be blank"
-	} else if utf8.RuneCountInString(form.Name) > 50 {
-		fieldErrors["name"] = "this field can not be more than 50 characters long"
-	}
-
-	if strings.TrimSpace(form.Nickname) == "" {
-		fieldErrors["nickname"] = "this field can not be blank"
-	} else if utf8.RuneCountInString(form.Nickname) > 30 {
-		fieldErrors["nickname"] = "this field can not be more than 30 characters long"
-	}
-
-	if strings.TrimSpace(form.Email) == "" {
-		fieldErrors["email"] = "This field can not be blank"
-	}
-
-	if strings.TrimSpace(form.Password) == "" {
-		fieldErrors["email"] = "This field can not be blank"
-	} else if utf8.RuneCountInString(form.Password) < 8 {
-		fieldErrors["email"] = "This field can not be less than 8"
-	}
-
-	if len(fieldErrors) > 0 {
+	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "userCreate.tmpl", data)
