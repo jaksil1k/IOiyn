@@ -105,6 +105,8 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "User successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
 }
 
@@ -138,8 +140,13 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+
 	data := app.newTemplateData(r)
 	data.User = user
+	data.Flash = flash
+
 	app.render(w, http.StatusOK, "userView.tmpl", data)
 }
 

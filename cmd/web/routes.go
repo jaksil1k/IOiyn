@@ -16,14 +16,16 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	router.HandlerFunc(http.MethodGet, "/", app.home)
-	router.HandlerFunc(http.MethodGet, "/game/view/:id", app.gameView)
-	router.HandlerFunc(http.MethodGet, "/game/create", app.gameCreate)
-	router.HandlerFunc(http.MethodPost, "/game/create", app.gameCreatePost)
-	router.HandlerFunc(http.MethodGet, "/game/catalogView", app.catalogView)
-	router.HandlerFunc(http.MethodGet, "/user/view/:id", app.userView)
-	router.HandlerFunc(http.MethodGet, "/user/create", app.userCreate)
-	router.HandlerFunc(http.MethodPost, "/user/create", app.userCreatePost)
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
+	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
+	router.Handler(http.MethodGet, "/game/view/:id", dynamic.ThenFunc(app.gameView))
+	router.Handler(http.MethodGet, "/game/create", dynamic.ThenFunc(app.gameCreate))
+	router.Handler(http.MethodPost, "/game/create", dynamic.ThenFunc(app.gameCreatePost))
+	router.Handler(http.MethodGet, "/game/catalogView", dynamic.ThenFunc(app.catalogView))
+	router.Handler(http.MethodGet, "/user/view/:id", dynamic.ThenFunc(app.userView))
+	router.Handler(http.MethodGet, "/user/create", dynamic.ThenFunc(app.userCreate))
+	router.Handler(http.MethodPost, "/user/create", dynamic.ThenFunc(app.userCreatePost))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 

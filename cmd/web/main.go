@@ -4,22 +4,26 @@ import (
 	"IOiyn.kz/internal/models"
 	"database/sql"
 	"flag"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type application struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	games         *models.GameModel
-	db            *models.DBModel
-	users         *models.UserModel
-	templateCache map[string]*template.Template
-	formDecoder   *form.Decoder
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	games          *models.GameModel
+	db             *models.DBModel
+	users          *models.UserModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -39,41 +43,47 @@ func main() {
 
 	defer db.Close()
 
+	modelDB := models.DBModel{DB: db}
+	err = modelDB.DropTables()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	err = modelDB.CreateTables()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer modelDB.DropTables()
+
+	modelUser := models.UserModel{DB: db}
+	err = modelUser.CreateInitialUsers()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	modelGame := models.GameModel{DB: db}
+	err = modelGame.CreateInitialGames()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
 	formDecoder := form.NewDecoder()
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
 
 	app := &application{
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		games:         &models.GameModel{DB: db},
-		db:            &models.DBModel{DB: db},
-		users:         &models.UserModel{DB: db},
-		templateCache: templateCache,
-		formDecoder:   formDecoder,
-	}
-
-	err = app.db.DropTables()
-	if err != nil {
-		errorLog.Fatal(err)
-	}
-	err = app.db.CreateTables()
-	if err != nil {
-		errorLog.Fatal(err)
-	}
-	defer app.db.DropTables()
-
-	err = app.users.CreateInitialUsers()
-	if err != nil {
-		errorLog.Fatal(err)
-	}
-
-	err = app.games.CreateInitialGames()
-	if err != nil {
-		errorLog.Fatal(err)
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		games:          &modelGame,
+		users:          &modelUser,
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	mux := http.NewServeMux()

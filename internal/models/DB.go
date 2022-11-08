@@ -43,6 +43,12 @@ func (m *DBModel) CreateTables() error {
 	FOREIGN KEY(game_id) REFERENCES games(game_id),
 	FOREIGN KEY(genre_id) REFERENCES genres(genre_id)
 );`
+	createSession := `CREATE TABLE sessions (
+		token CHAR(43) PRIMARY KEY,
+		data BLOB NOT NULL,
+		expiry TIMESTAMP(6) NOT NULL
+	);`
+
 	//fmt.Println(createSchemaQuery, createUsersQuery, createGenreQuery, createGamesQuery, createPurchasedGamesQuery)
 	//_, err := m.DB.Exec(createSchemaQuery)
 	//if err != nil {
@@ -79,6 +85,17 @@ func (m *DBModel) CreateTables() error {
 		return err
 	}
 
+	_, err = m.DB.Exec(createSession)
+	if err != nil {
+		return err
+	}
+
+	createSession = `CREATE INDEX sessions_expiry_idx ON sessions (expiry);`
+	_, err = m.DB.Exec(createSession)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -88,6 +105,7 @@ func (m *DBModel) DropTables() error {
 	dropGames := "DROP TABLE IF EXISTS games"
 	dropUsers := "DROP TABLE IF EXISTS users"
 	dropGenre := "DROP TABLE IF EXISTS genres"
+	dropSession := "DROP TABLE IF EXISTS sessions"
 	//dropSchema := "DROP SCHEMA IF EXISTS game"
 
 	_, err := m.DB.Exec(dropPurchased)
@@ -115,6 +133,10 @@ func (m *DBModel) DropTables() error {
 		return err
 	}
 
+	_, err = m.DB.Exec(dropSession)
+	if err != nil {
+		return err
+	}
 	//_, err = m.DB.Exec(dropSchema)
 	//if err != nil {
 	//	return err
