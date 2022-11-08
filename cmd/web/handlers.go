@@ -19,9 +19,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	app.render(w, http.StatusOK, "home.tmpl", &templateData{
-		Games: games,
-	})
+	data := app.newTemplateData(r)
+	data.Games = games
+	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -39,9 +39,9 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "gameView.tmpl", &templateData{
-		Game: game,
-	})
+	data := app.newTemplateData(r)
+	data.Game = game
+	app.render(w, http.StatusOK, "gameView.tmpl", data)
 }
 func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -99,9 +99,9 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	app.render(w, http.StatusOK, "userView.tmpl", &templateData{
-		User: user,
-	})
+	data := app.newTemplateData(r)
+	data.User = user
+	app.render(w, http.StatusOK, "userView.tmpl", data)
 }
 
 func (app *application) catalogView(w http.ResponseWriter, r *http.Request) {
