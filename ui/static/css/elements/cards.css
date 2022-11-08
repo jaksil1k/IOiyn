@@ -21,9 +21,11 @@
 }
 .cards__card__game-name {
   color: white;
+  display: inline;
 }
-.cards__card__author-name {
-  font-family: "AtypTextBoldItalic", sans-serif !important;
+.cards__card__game-price {
+  font-style: italic;
+  color: white;
 }
 .cards__card img {
   object-fit: cover;

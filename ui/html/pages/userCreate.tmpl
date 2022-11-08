@@ -6,24 +6,43 @@
     <form class='form-login' action='' method='POST' novalidate>
         <div>
             <label>Name:</label>
-            <input type='text' name='name' value=''>
+            <input type='text' name='name' value='{{.Form.Name}}'>
         </div>
         <div>
             <label>Nickname:</label>
-            <input type='text' name='nickname' value=''>
+            <input type='text' name='nickname' value='{{.Form.Nickname}}'>
         </div>
         <div>
             <label>Email:</label>
-            <input type='email' name='email' value=''>
+            <input type='email' name='email' value='{{.Form.Email}}'>
         </div>
         <div>
             <label>Password:</label>
             <input type='password' name='password'>
         </div>
         <div>
+
             <input type='submit' value='Signup'>
         </div>
+        <section class="error">
+            {{with .Form.FieldErrors.name}}
+                {{.}}
+            {{end}}
+            <br>
+            {{with .Form.FieldErrors.nickname}}
+                {{.}}
+            {{end}}
+            <br>
+            {{with .Form.FieldErrors.email}}
+                {{.}}
+            {{end}}
+            <br>
+            {{with .Form.FieldErrors.password}}
+                {{.}}
+            {{end}}
+        </section>
     </form>
+
 {{end}}
 
 {{define "footer"}}

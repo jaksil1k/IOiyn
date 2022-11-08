@@ -125,7 +125,7 @@ input[type=submit], textarea[type=submit] {
   border: 1px solid #EA4256;
   color: #F6F6F6;
   padding: 0.4rem 1rem;
-  width: 10rem;
+  width: auto;
   transition: background-color 0.5s ease;
 }
 input[type=submit]:hover, textarea[type=submit]:hover {

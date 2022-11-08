@@ -6,19 +6,32 @@
     <form class='form-login' action='' method='POST' novalidate>
         <div>
             <label>Name:</label>
-            <input type='email' name='email' value=''>
+            <input type='text' name='name' value='{{.Form.Name}}'>
         </div>
         <div>
             <label>Cost:</label>
-            <input type='password' name='password'>
+            <input type='text' name='cost' value="{{.Form.Cost}}">
         </div>
         <div>
             <label>Description:</label>
-            <textarea name="w3review" rows="4" cols="50"></textarea>
+            <textarea name="description" rows="4" cols="50" {{.Form.Description}}></textarea>
         </div>
         <div>
             <input type='submit' value='Login'>
         </div>
+        <section class="error">
+            {{with .Form.FieldErrors.name}}
+                {{.}}
+            {{end}}
+            <br>
+            {{with .Form.FieldErrors.cost}}
+                {{.}}
+            {{end}}
+            <br>
+            {{with .Form.FieldErrors.description}}
+                {{.}}
+            {{end}}
+        </section>
     </form>
 {{end}}
 

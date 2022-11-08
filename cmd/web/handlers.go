@@ -84,18 +84,19 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 	}
 
-	form.CheckField(validator.NotBlank(form.Name), "name", "This cannot be blank")
-	form.CheckField(validator.MaxChars(form.Name, 50), "name", "This field cannot be more than 50 character long")
-	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "This cannot be blank")
-	form.CheckField(validator.MaxChars(form.Nickname, 30), "nickname", "This field cannot be more than 50 character long")
-	form.CheckField(validator.NotBlank(form.Email), "email", "This cannot be blank")
-	form.CheckField(validator.NotBlank(form.Email), "password", "This cannot be blank")
-	form.CheckField(validator.MinChars(form.Password, 8), "password", "This cannot be less than 8")
+	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 50), "name", "Name field cannot be more than 50 character long")
+	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
+	form.CheckField(validator.MaxChars(form.Nickname, 30), "nickname", "Nickname field cannot be more than 50 character long")
+	form.CheckField(validator.NotBlank(form.Email), "email", "Email cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "password", "Password cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
 
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "userCreate.tmpl", data)
+		return
 	}
 
 	id, err := app.users.Insert(form.Name, form.Nickname, 1000, form.Email, form.Password)

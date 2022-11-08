@@ -1,29 +1,58 @@
 {{define "styles"}}
-    <link rel="stylesheet" href="">
     <link rel='stylesheet' href='/static/css/partials/footer.css'>
+    <link rel='stylesheet' href='/static/css/elements/game.css'>
 {{end}}
 
 {{define "main"}}
-    {{with .Game}}
-       {{.Name}}
-       {{.AuthorName}}
-       {{.Description}}
-       {{.Cost}}
-       {{.ReleaseDate.Day}}, {{.ReleaseDate.Year}}{{.ReleaseDate.Year}}
-{{/*        тут хуман дейт над поменять*/}}
-    {{end}}
+
+    <section class="game">
+        {{with .Game}}
+            <div class="game__info">
+                <div class="game__img">
+                    <img src="https://preview.redd.it/3quah3zosi571.jpg?width=2715&format=pjpg&auto=webp&s=59d3a2d86fe661ca6207e388b30c4ae23045d2ac"
+                         alt="no content">
+                </div>
+                <div class="game__data">
+                    <div>
+                        <p>Name:</p>
+                        <p>{{.Name}}</p>
+                    </div>
+                    <div>
+                        <p>Release Date:</p>
+                        <p>{{.ReleaseDate.Day}}, {{.ReleaseDate.Year}}{{.ReleaseDate.Year}}</p>
+                        {{/*        тут хуман дейт над поменять*/}}
+                    </div>
+                    <div>
+                        <p>Author:</p>
+                        <p><a href="/user/view/{{.Author.ID}}">{{.Author.Name}}</a></p>
+                    </div>
+                    <div>
+                        <input type="submit" value="Buy ({{.Cost}}$)">
+                    </div>
+                </div>
+            </div>
+            <div class="game__description">
+                <h4>Description</h4>
+                {{.Description}}
+
+
+            </div>
+        {{end}}
+    </section>
+
+
 {{end}}
 
 {{define "footer"}}
-<footer class="footer">
-<ul class="footer__list">
-<li class="footer__item">
-<a href="https://github.com/jaksil1k">
-Site of creator
-</a>
-</li>
-<li class="footer__item">Copyright © 2022 All Rights Reserved</li>
-<li class="footer__item">+7 (777) 777-77-77</li>
-</ul>
-</footer>
+    <footer class="footer">
+        <ul class="footer__list">
+            <li class="footer__item">
+                <a href="https://github.com/jaksil1k">
+                    Site of creator
+                </a>
+            </li>
+            <li class="footer__item">Copyright © 2022 All Rights Reserved</li>
+            <li class="footer__item">+7 (777) 777-77-77</li>
+        </ul>
+    </footer>
 {{end}}

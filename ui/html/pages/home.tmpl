@@ -3,20 +3,24 @@
     <link rel='stylesheet' href='/static/css/partials/footer.css'>
 {{end}}
 {{define "main"}}
-    <h2>Latest releases</h2>
+    <center>
+        <h2>Latest releases</h2><br>
+    </center>
+
     {{if .Games}}
+
         <section class="cards">
             {{range .Games}}
+
                 <a href="/game/view/{{.ID}}" class="cards__card">
-                    <img src="/static/img/dota_poster.webp"
-                         alt="Poster">
-                    <div class="cards__card__content">
-                        <p>
-                            <span class="cards__card__game-name">{{.Name}}</span>
-                            <span class="cards__card__author-name">by {{.AuthorName}}</span>
-                        </p>
+                    <div>
+                        <img src="/static/img/dota_poster.webp" alt="Poster">
                     </div>
-                    <footer>
+                    <div class="cards__card__content">
+                        <span class="cards__card__game-name">{{.Name}}</span>
+                        <span class="cards__card__game-name">by {{.Author.Name}}</span>
+                    </div>
+                    <footer class="cards__card__game-price">
                         {{if ne .Cost 0}}
                             {{.Cost}}$
                         {{else}}
@@ -31,15 +35,15 @@
     {{end}}
 {{end}}
 {{define "footer"}}
-<footer class="footer">
-<ul class="footer__list">
-<li class="footer__item">
-<a href="https://github.com/jaksil1k">
-Site of creator
-</a>
-</li>
-<li class="footer__item">Copyright © 2022 All Rights Reserved</li>
-<li class="footer__item">+7 (777) 777-77-77</li>
-</ul>
-</footer>
+    <footer class="footer">
+        <ul class="footer__list">
+            <li class="footer__item">
+                <a href="https://github.com/jaksil1k">
+                    Site of creator
+                </a>
+            </li>
+            <li class="footer__item">Copyright © 2022 All Rights Reserved</li>
+            <li class="footer__item">+7 (777) 777-77-77</li>
+        </ul>
+    </footer>
 {{end}}
