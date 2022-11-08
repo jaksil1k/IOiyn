@@ -72,8 +72,7 @@ func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "gameCreate.tmpl", data)
+
 }
 
 func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
