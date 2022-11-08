@@ -1,0 +1,38 @@
+.cards {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+.cards__card {
+  display: grid;
+  grid-template-rows: max-content 25px 1fr;
+  gap: 0.8rem;
+  width: 20%;
+  background: #EA4256;
+  height: 23rem;
+  margin: 0 0 3rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  text-align: center;
+  transition: all 0.5s ease;
+}
+.cards__card__game-name {
+  color: white;
+}
+.cards__card__author-name {
+  font-family: "AtypTextBoldItalic", sans-serif !important;
+}
+.cards__card img {
+  object-fit: cover;
+  width: 100%;
+  height: 18rem;
+}
+.cards__card:hover {
+  margin-top: -0.5rem;
+  outline: 1px solid #EA4256;
+}
+
+/*# sourceMappingURL=cards.css.map */

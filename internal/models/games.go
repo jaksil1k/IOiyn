@@ -117,7 +117,11 @@ func (m *GameModel) CreateInitialGames() error {
 	if err != nil {
 		return err
 	}
-	_, err = m.Insert(1, "cs go", "shit but not shit", 0, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
+	_, err = m.Insert(1, "cs go", "simple гений", 0, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		return err
+	}
+	_, err = m.Insert(1, "the last of us", "THE BEST GAME", 20, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
 	if err != nil {
 		return err
 	}

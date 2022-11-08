@@ -3,14 +3,11 @@
     <html lang='en'>
     <head>
         <meta charset='utf-8'>
-{{/*        <title>{{template "title" .}}</title>*/}}
         <link rel='stylesheet' href='/static/css/general/main.css'>
         <link rel='stylesheet' href='/static/css/general/reset.css'>
-        <link rel='stylesheet' href='/static/css/elements/nav.css'>
-        <link rel='stylesheet' href='/static/css/elements/footer.css'>
-        <link rel='stylesheet' href='/static/css/elements/account.css'>
-        <link rel='stylesheet' href='/static/css/elements/form-login.css'>
-        <link rel='stylesheet' href='/static/css/elements/info.css'>
+        <link rel='stylesheet' href='/static/css/partials/nav.css'>
+        <link rel='stylesheet' href='/static/css/partials/footer.css'>
+        {{template "styles" .}}
     </head>
     <body>
     {{template "nav" .}}

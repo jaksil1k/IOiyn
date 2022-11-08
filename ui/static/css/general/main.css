@@ -93,6 +93,15 @@ h1 {
 }
 
 input {
+  padding: 0 1rem;
+}
+
+textarea {
+  padding: 0.6rem 1rem;
+  max-height: 5rem;
+}
+
+input, textarea {
   border: 1px solid black;
   border-radius: 5px;
   font-size: 1rem;
@@ -101,18 +110,17 @@ input {
   justify-content: center;
   align-items: center;
   transition: border 0.5s ease;
-  padding: 0 1rem;
 }
-input:hover {
+input:hover, textarea:hover {
   border: 1px solid #EA4256;
 }
-input:focus {
+input:focus, textarea:focus {
   outline: 1px solid #EA4256;
 }
-input::placeholder {
+input::placeholder, textarea::placeholder {
   font-size: 1rem;
 }
-input[type=submit] {
+input[type=submit], textarea[type=submit] {
   background: #EA4256;
   border: 1px solid #EA4256;
   color: #F6F6F6;
@@ -120,7 +128,7 @@ input[type=submit] {
   width: 10rem;
   transition: background-color 0.5s ease;
 }
-input[type=submit]:hover {
+input[type=submit]:hover, textarea[type=submit]:hover {
   background: transparent;
   border: 1px solid #EA4256;
   color: black;

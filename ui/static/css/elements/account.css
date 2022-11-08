@@ -10,7 +10,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  padding: 0 10rem;
+  padding: 0 6rem;
 }
 .account__item {
   width: 100%;

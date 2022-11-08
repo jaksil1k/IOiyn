@@ -1,23 +1,37 @@
+{{define "styles"}}
+    <link rel='stylesheet' href='/static/css/elements/cards.css'>
+{{end}}
 {{define "main"}}
     <h2>Latest releases</h2>
     {{if .Games}}
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Release Date</th>
-                <th>Author</th>
-                <th>Cost</th>
-            </tr>
+        <section class="cards">
             {{range .Games}}
-                <tr>
-                    <td><a href='/game/view?id={{.ID}}'>{{.Name}}</a></td>
-                    <td>{{.ReleaseDate}}</td>
-                    <td>{{.AuthorName}}</td>
-                    <td>{{.Cost}}$</td>
-                </tr>
+                <a href="/game/view/{{.ID}}" class="cards__card">
+                    <img src="/static/img/dota_poster.webp"
+                         alt="Poster">
+                    <div class="cards__card__content">
+                        <p>
+                            <span class="cards__card__game-name">{{.Name}}</span>
+                            <span class="cards__card__author-name">by {{.AuthorName}}</span>
+                        </p>
+                    </div>
+                    <footer>
+                        {{if ne .Cost 0}}
+                            {{.Cost}}$
+                        {{else}}
+                            Free
+                        {{end}}
+                    </footer>
+                </a>
             {{end}}
-        </table>
+        </section>
     {{else}}
         <p>There's no games yet, be the first!</p>
     {{end}}
+
+    {{/*                    <td><a href='/game/view?id={{.ID}}'>{{.Name}}</a></td>*/}}
+    {{/*                    <td>{{.ReleaseDate.Day}} {{.ReleaseDate.Month}} {{.ReleaseDate.Year}}</td>*/}}
+    {{/*                    <td>{{.AuthorName}}</td>*/}}
+    {{/*                    <td>{{.Cost}}$</td>*/}}
+
 {{end}}
