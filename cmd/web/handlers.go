@@ -4,7 +4,6 @@ import (
 	"IOiyn.kz/internal/models"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -20,26 +19,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/partials/footer.tmpl",
-		"./ui/html/pages/home.tmpl",
-	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
+	app.render(w, http.StatusOK, "home.tmpl", &templateData{
 		Games: games,
-	}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	})
 }
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -57,7 +39,9 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", game)
+	app.render(w, http.StatusOK, "gameView.tmpl", &templateData{
+		Game: game,
+	})
 }
 func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -115,25 +99,9 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/partials/footer.tmpl",
-		"./ui/html/pages/userView.tmpl",
-	}
-	// Parse the template files...
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	// And then execute them. Notice how we are passing in the snippet
-	// data (a models.Snippet struct) as the final parameter?
-	err = ts.ExecuteTemplate(w, "base", user)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
+	app.render(w, http.StatusOK, "userView.tmpl", &templateData{
+		User: user,
+	})
 }
 
 func (app *application) catalogView(w http.ResponseWriter, r *http.Request) {
