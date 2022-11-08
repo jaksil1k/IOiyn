@@ -1,5 +1,6 @@
 {{define "styles"}}
     <link rel='stylesheet' href='/static/css/elements/cards.css'>
+    <link rel='stylesheet' href='/static/css/partials/footer.css'>
 {{end}}
 {{define "main"}}
     <h2>Latest releases</h2>
@@ -28,10 +29,4 @@
     {{else}}
         <p>There's no games yet, be the first!</p>
     {{end}}
-
-    {{/*                    <td><a href='/game/view?id={{.ID}}'>{{.Name}}</a></td>*/}}
-    {{/*                    <td>{{.ReleaseDate.Day}} {{.ReleaseDate.Month}} {{.ReleaseDate.Year}}</td>*/}}
-    {{/*                    <td>{{.AuthorName}}</td>*/}}
-    {{/*                    <td>{{.Cost}}$</td>*/}}
-
 {{end}}

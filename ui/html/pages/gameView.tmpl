@@ -1,7 +1,15 @@
 {{define "styles"}}
     <link rel="stylesheet" href="">
+    <link rel='stylesheet' href='/static/css/partials/footer.css'>
 {{end}}
 
 {{define "main"}}
-    something
+    {{with .Game}}
+       {{.Name}}
+       {{.AuthorName}}
+       {{.Description}}
+       {{.Cost}}
+       {{.ReleaseDate.Day}}, {{.ReleaseDate.Year}}{{.ReleaseDate.Year}}
+{{/*        тут хуман дейт над поменять*/}}
+    {{end}}
 {{end}}
