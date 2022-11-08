@@ -4,16 +4,13 @@ import (
 	"IOiyn.kz/internal/models"
 	"errors"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
 	games, err := app.games.Latest()
 	if err != nil {
 		app.serverError(w, err)
@@ -24,7 +21,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	params := httprouter.ParamsFromContext(r.Context())
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
@@ -43,13 +41,7 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	data.Game = game
 	app.render(w, http.StatusOK, "gameView.tmpl", data)
 }
-func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
+func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 	user, err := app.users.GetById(1)
 	if err != nil {
 		app.serverError(w, err)
@@ -61,15 +53,10 @@ func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/game/view?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/game/view/%d", id), http.StatusSeeOther)
 }
 
-func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
+func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
 	name := "Zaur"
 	nickname := "Lagmazavr"
 	balance := 100
@@ -81,7 +68,15 @@ func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/user/view?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
+}
+
+func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Display the form for creating a new snippet..."))
+}
+
+func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Display the form for creating a new snippet..."))
 }
 
 func (app *application) userView(w http.ResponseWriter, r *http.Request) {

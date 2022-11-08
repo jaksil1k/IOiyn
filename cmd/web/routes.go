@@ -1,24 +1,31 @@
 package main
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
 )
 
 func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
+	router := httprouter.New()
+
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.notFound(w)
+	})
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/game/view", app.gameView)
-	mux.HandleFunc("/game/create", app.gameCreate)
-	mux.HandleFunc("/game/catalogView", app.catalogView)
-	mux.HandleFunc("/user/view", app.userView)
-	mux.HandleFunc("/user/create", app.userCreate)
+	router.HandlerFunc(http.MethodGet, "/", app.home)
+	router.HandlerFunc(http.MethodGet, "/game/view", app.gameView)
+	router.HandlerFunc(http.MethodGet, "/game/create", app.gameCreate)
+	router.HandlerFunc(http.MethodPost, "/game/create", app.gameCreatePost)
+	router.HandlerFunc(http.MethodGet, "/game/catalogView", app.catalogView)
+	router.HandlerFunc(http.MethodGet, "/user/view", app.userView)
+	router.HandlerFunc(http.MethodGet, "/user/create", app.userCreate)
+	router.HandlerFunc(http.MethodPost, "/user/create", app.userCreatePost)
 
-	standart := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
-	return standart.Then(mux)
+	return standard.Then(router)
 }
