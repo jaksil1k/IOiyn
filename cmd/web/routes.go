@@ -17,11 +17,11 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
 	router.HandlerFunc(http.MethodGet, "/", app.home)
-	router.HandlerFunc(http.MethodGet, "/game/view", app.gameView)
+	router.HandlerFunc(http.MethodGet, "/game/view/:id", app.gameView)
 	router.HandlerFunc(http.MethodGet, "/game/create", app.gameCreate)
 	router.HandlerFunc(http.MethodPost, "/game/create", app.gameCreatePost)
 	router.HandlerFunc(http.MethodGet, "/game/catalogView", app.catalogView)
-	router.HandlerFunc(http.MethodGet, "/user/view", app.userView)
+	router.HandlerFunc(http.MethodGet, "/user/view/:id", app.userView)
 	router.HandlerFunc(http.MethodGet, "/user/create", app.userCreate)
 	router.HandlerFunc(http.MethodPost, "/user/create", app.userCreatePost)
 

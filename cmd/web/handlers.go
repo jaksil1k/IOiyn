@@ -57,12 +57,17 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
-	name := "Zaur"
-	nickname := "Lagmazavr"
-	balance := 100
-	email := "zaur@gmail.com"
-	password := "password"
-	id, err := app.users.Insert(name, nickname, balance, email, password)
+	err := r.ParseForm()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	name := r.PostForm.Get("name")
+	nickname := r.PostForm.Get("nickname")
+	email := r.PostForm.Get("email")
+	password := r.PostForm.Get("password")
+
+	id, err := app.users.Insert(name, nickname, 1000, email, password)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -82,11 +87,15 @@ func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) userView(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
+
 	user, err := app.users.GetById(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
