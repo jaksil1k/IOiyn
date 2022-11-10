@@ -24,19 +24,39 @@
     </section>
     {{end}}
 
+
     <section class="cards">
         <ul class="cards__list">
             <li class="cards__item">
                 <div>Created Games</div>
             </li>
             <li class="cards__item">
-                <div>None</div>
-            </li>
-            <li class="cards__item">
-                <div>Bought Games</div>
-            </li>
-            <li class="cards__item">
-                <div>None</div>
+                <div>
+{{/*                    {{if .Games}}*/}}
+{{/*                        <section class="cards">*/}}
+{{/*                            {{range .Games}}*/}}
+{{/*                                <a href="/game/view/{{.ID}}" class="cards__card">*/}}
+{{/*                                    <div>*/}}
+{{/*                                        <img src="/static/img/no_photo.jpg" alt="Poster">*/}}
+{{/*                                    </div>*/}}
+{{/*                                    <div class="cards__card__content">*/}}
+{{/*                                        <span class="cards__card__game-name">{{.Name}}</span>*/}}
+{{/*                                        <span class="cards__card__game-name">by {{.AuthorName}}</span>*/}}
+{{/*                                    </div>*/}}
+{{/*                                    <footer class="cards__card__game-price">*/}}
+{{/*                                        {{if ne .Cost 0}}*/}}
+{{/*                                            {{.Cost}}$*/}}
+{{/*                                        {{else}}*/}}
+{{/*                                            Free*/}}
+{{/*                                        {{end}}*/}}
+{{/*                                    </footer>*/}}
+{{/*                                </a>*/}}
+{{/*                            {{end}}*/}}
+{{/*                        </section>*/}}
+{{/*                    {{else}}*/}}
+{{/*                        <p>There's no games yet, be the first!</p>*/}}
+{{/*                    {{end}}*/}}
+                </div>
             </li>
         </ul>
     </section>
