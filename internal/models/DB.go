@@ -51,6 +51,11 @@ func (m *DBModel) CreateTables() error {
 
 	userEmailConstraint := `ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);`
 
+	gamesUsersName := `CREATE VIEW games_user_name AS
+SELECT g.game_id, g.created_by, g.name game_name, g.description, g.cost, g.release_year, u.name user_name
+FROM games g JOIN users u ON g.created_by = u.user_id;
+`
+
 	//fmt.Println(createSchemaQuery, createUsersQuery, createGenreQuery, createGamesQuery, createPurchasedGamesQuery)
 	//_, err := m.DB.Exec(createSchemaQuery)
 	//if err != nil {
@@ -103,11 +108,17 @@ func (m *DBModel) CreateTables() error {
 		return err
 	}
 
+	_, err = m.DB.Exec(gamesUsersName)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *DBModel) DropTables() error {
 	dropPurchased := "DROP TABLE IF EXISTS purchased_games"
+	dropGamesUserIdView := `DROP VIEW games_user_name`
 	dropGamesGenres := "DROP TABLE IF EXISTS games_genres"
 	dropGames := "DROP TABLE IF EXISTS games"
 	dropUsers := "DROP TABLE IF EXISTS users"
@@ -116,6 +127,11 @@ func (m *DBModel) DropTables() error {
 	//dropSchema := "DROP SCHEMA IF EXISTS game"
 
 	_, err := m.DB.Exec(dropPurchased)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.DB.Exec(dropGamesUserIdView)
 	if err != nil {
 		return err
 	}

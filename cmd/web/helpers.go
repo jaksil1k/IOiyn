@@ -25,16 +25,17 @@ func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
 
-func (app *application) newTemplateData(r *http.Request) *templateData {
-	return &templateData{
+func (app *application) newTemplateData(r *http.Request) *templateDate {
+	return &templateDate{
 		CurrenYear:      time.Now().Year(),
 		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated: app.isAuthenticated(r),
 		CSRFToken:       nosurf.Token(r),
+		UserId:          app.sessionManager.GetInt(r.Context(), "authenticatedUserID"),
 	}
 }
 
-func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
+func (app *application) render(w http.ResponseWriter, status int, page string, data *templateDate) {
 	ts, ok := app.templateCache[page]
 	if !ok {
 		err := fmt.Errorf("the template %s does not exists", page)

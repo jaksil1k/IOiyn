@@ -62,7 +62,7 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 
 	user, err := app.users.GetById(game.CreatedBy)
 	user.Password = []byte("")
-	game.Author = user
+	game.AuthorName = user.Name
 	data := app.newTemplateData(r)
 	data.Game = game
 
@@ -95,7 +95,7 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.games.Insert(1, form.Name, form.Description, form.Cost, time.Now())
+	id, err := app.games.Insert(app.sessionManager.GetInt(r.Context(), "authenticatedUserID"), form.Name, form.Description, form.Cost, time.Now())
 	if err != nil {
 		app.serverError(w, err)
 		return

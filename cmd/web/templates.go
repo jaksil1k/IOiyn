@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-type templateData struct {
+type templateDate struct {
 	Game            *models.Game
 	Games           []*models.Game
 	User            *models.User
@@ -15,6 +15,7 @@ type templateData struct {
 	Form            any
 	Flash           string
 	CSRFToken       string
+	UserId          int
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
