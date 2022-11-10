@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type userCreateForm struct {
+type userSignupForm struct {
 	Name                string `form:"name"`
 	Nickname            string `form:"nickname"`
 	Email               string `form:"email"`
@@ -55,7 +55,7 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := app.users.GetById(game.CreatedBy)
-	user.Password = ""
+	user.Password = []byte("")
 	game.Author = user
 	data := app.newTemplateData(r)
 	data.Game = game
@@ -100,55 +100,15 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/game/view/%d", id), http.StatusSeeOther)
 }
 
-func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	var form userCreateForm
-
-	err = app.formDecoder.Decode(&form, r.PostForm)
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-	}
-
-	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
-	form.CheckField(validator.MaxChars(form.Name, 50), "name", "Name field cannot be more than 50 character long")
-	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
-	form.CheckField(validator.MaxChars(form.Nickname, 30), "nickname", "Nickname field cannot be more than 50 character long")
-	form.CheckField(validator.NotBlank(form.Email), "email", "Email cannot be blank")
-	form.CheckField(validator.NotBlank(form.Email), "password", "Password cannot be blank")
-	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
-
-	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity, "userCreate.tmpl", data)
-		return
-	}
-
-	id, err := app.users.Insert(form.Name, form.Nickname, 1000, form.Email, form.Password)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	app.sessionManager.Put(r.Context(), "flash", "User successfully created!")
-
-	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
-}
-
 func (app *application) gameCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = gameCreateForm{}
 	app.render(w, http.StatusOK, "gameCreate.tmpl", data)
 }
 
-func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	data.Form = userCreateForm{}
+	data.Form = userSignupForm{}
 	app.render(w, http.StatusOK, "userCreate.tmpl", data)
 }
 
@@ -182,3 +142,95 @@ func (app *application) catalogView(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "Display a specific catalog of games ")
 }
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	var form userSignupForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 255), "name", "Name field cannot be more than 255 character long")
+	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
+	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 255 character long")
+	form.CheckField(validator.NotBlank(form.Email), "email", "Email cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Email), "password", "Password cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "userCreate.tmpl", data)
+		return
+	}
+
+	err = app.users.Insert(form.Name, form.Nickname, 1000, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			form.AddFieldError("email", "Email address is already in use")
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	app.sessionManager.Put(r.Context(), "flash", "Your signup was successful. Please log in.")
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+
+}
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
+}
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate and login the user...")
+}
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Logout the user...")
+}
+
+//func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {
+//	err := r.ParseForm()
+//	if err != nil {
+//		app.serverError(w, err)
+//		return
+//	}
+//
+//	var form userSignupForm
+//
+//	err = app.formDecoder.Decode(&form, r.PostForm)
+//	if err != nil {
+//		app.clientError(w, http.StatusBadRequest)
+//	}
+//
+//	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
+//	form.CheckField(validator.MaxChars(form.Name, 255), "name", "Name field cannot be more than 50 character long")
+//	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
+//	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 50 character long")
+//	form.CheckField(validator.NotBlank(form.Email), "email", "Email cannot be blank")
+//	form.CheckField(validator.NotBlank(form.Email), "password", "Password cannot be blank")
+//	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
+//
+//	if !form.Valid() {
+//		data := app.newTemplateData(r)
+//		data.Form = form
+//		app.render(w, http.StatusUnprocessableEntity, "userSignup.tmpl", data)
+//		return
+//	}
+//
+//	err := app.users.Insert(form.Name, form.Nickname, 1000, form.Email, form.Password)
+//	if err != nil {
+//		app.serverError(w, err)
+//		return
+//	}
+//
+//	app.sessionManager.Put(r.Context(), "flash", "User successfully created!")
+//
+//	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
+//}

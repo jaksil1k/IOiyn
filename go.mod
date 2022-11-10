@@ -10,4 +10,7 @@ require (
 	github.com/justinas/alice v1.2.0
 )
 
-require github.com/alexedwards/scs/mysqlstore v0.0.0-20220528130143-d93ace5be94b // indirect
+require (
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20220528130143-d93ace5be94b // indirect
+	golang.org/x/crypto v0.2.0 // indirect
+)

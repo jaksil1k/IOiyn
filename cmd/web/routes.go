@@ -23,10 +23,16 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/game/create", dynamic.ThenFunc(app.gameCreate))
 	router.Handler(http.MethodPost, "/game/create", dynamic.ThenFunc(app.gameCreatePost))
 	router.Handler(http.MethodGet, "/game/catalogView", dynamic.ThenFunc(app.catalogView))
-	router.Handler(http.MethodGet, "/user/view/:id", dynamic.ThenFunc(app.userView))
-	router.Handler(http.MethodGet, "/user/create", dynamic.ThenFunc(app.userCreate))
-	router.Handler(http.MethodPost, "/user/create", dynamic.ThenFunc(app.userCreatePost))
 
+	router.Handler(http.MethodGet, "/user/view/:id", dynamic.ThenFunc(app.userView))
+
+	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))
+	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLogin))
+	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
+	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(app.userLogoutPost))
+
+	//router.Handler(http.MethodPost, "/user/create", dynamic.ThenFunc(app.userSignup))
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
 	return standard.Then(router)

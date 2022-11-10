@@ -12,7 +12,7 @@ func (m *DBModel) CreateTables() error {
 	createGamesQuery := `CREATE TABLE IF NOT EXISTS games(
 	game_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
     created_by INTEGER NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
 	description TEXT NOT NULL,
     cost INTEGER NOT NULL,
     release_year DATE NOT NULL,
@@ -20,10 +20,10 @@ func (m *DBModel) CreateTables() error {
 );`
 	createUsersQuery := `CREATE TABLE IF NOT EXISTS users(
 	user_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    nickname VARCHAR(30) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    nickname VARCHAR(255) NOT NULL,
 	balance INTEGER NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL,
     password CHAR(60) NOT NULL,
     created DATETIME NOT NULL
 );`
@@ -48,6 +48,8 @@ func (m *DBModel) CreateTables() error {
 		data BLOB NOT NULL,
 		expiry TIMESTAMP(6) NOT NULL
 	);`
+
+	userEmailConstraint := `ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);`
 
 	//fmt.Println(createSchemaQuery, createUsersQuery, createGenreQuery, createGamesQuery, createPurchasedGamesQuery)
 	//_, err := m.DB.Exec(createSchemaQuery)
@@ -92,6 +94,11 @@ func (m *DBModel) CreateTables() error {
 
 	createSession = `CREATE INDEX sessions_expiry_idx ON sessions (expiry);`
 	_, err = m.DB.Exec(createSession)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.DB.Exec(userEmailConstraint)
 	if err != nil {
 		return err
 	}

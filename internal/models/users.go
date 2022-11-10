@@ -3,6 +3,9 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 )
 
@@ -12,7 +15,7 @@ type User struct {
 	Nickname string
 	Balance  int
 	Email    string
-	Password string
+	Password []byte
 	Created  time.Time
 }
 
@@ -20,21 +23,28 @@ type UserModel struct {
 	DB *sql.DB
 }
 
-func (m *UserModel) Insert(name string, nickname string, balance int, email string, password string) (int, error) {
+func (m *UserModel) Insert(name string, nickname string, balance int, email string, password string) error {
 	stmt := `insert into users(name, nickname, balance, email, password, created)
-	Values(?, ?, ?, ?, ?, ?)`
+	Values(?, ?, ?, ?, ?, UTC_TIMESTAMP)`
 
-	result, err := m.DB.Exec(stmt, name, nickname, balance, email, password, time.Now())
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	id, err := result.LastInsertId()
+	_, err = m.DB.Exec(stmt, name, nickname, balance, email, string(hashedPassword))
 	if err != nil {
-		return 0, err
+		var mySQLError *mysql.MySQLError
+		if errors.As(err, &mySQLError) {
+			if mySQLError.Number == 1062 && strings.Contains(mySQLError.Message, "users_uc_email") {
+				return ErrDuplicateEmail
+			}
+		}
+
+		return err
 	}
 
-	return int(id), nil
+	return nil
 }
 
 func (m *UserModel) Authenticate(email, password string) (int, error) {
@@ -72,7 +82,8 @@ func (m *UserModel) CreateInitialUsers() error {
 	balance := 100
 	email := "zaur@gmail.com"
 	password := "password"
-	_, err := m.Insert(name, nickname, balance, email, password)
+
+	err := m.Insert(name, nickname, balance, email, password)
 	if err != nil {
 		return err
 	}
