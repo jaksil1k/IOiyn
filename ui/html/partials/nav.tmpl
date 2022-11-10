@@ -1,31 +1,29 @@
 {{ define "nav" }}
-<nav class="nav">
-    <ul class="nav__list">
-        <li class="nav__item">
-            <a class="nav__link" href="/">
-                IOyin
-            </a>
-        </li>
-        <li class="nav__item">
+    <nav class="nav">
+        <ul class="nav__list">
+            <li class="nav__item">
+                <a class="nav__link" href="/">
+                    IOyin
+                </a>
+            </li>
+            <li class="nav__item">
 
-            {{if .IsAuthenticated}}
-<a class="nav__button" href="/game/create">Create game</a>
-            {{end}}
+                {{if .IsAuthenticated}}
+                    <a class="nav__button" href="/game/create">Create game</a>
+                {{end}}
 
-			{{if .IsAuthenticated}}
-            <form action='/user/logout' method='POST' class="nav__button">
-            <button>Logout</button>
-            </form>
-<input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
-        <a class="nav__button" href="/user/view/{{.UserId}}">Account</a>
-			{{else}}
-<a class="nav__button" href="/user/login">Login</a>
-<a class="nav__button" href="/user/signup">Signup</a>
+                {{if .IsAuthenticated}}
+                    <input action='/user/logout' method='POST' class="nav__button" value="Logout">
+                    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+                    <a class="nav__button" href="/user/view/{{.UserId}}">Account</a>
+                {{else}}
+                    <a class="nav__button" href="/user/login">Login</a>
+                    <a class="nav__button" href="/user/signup">Signup</a>
 
-            {{end}}
+                {{end}}
 
 
-</li>
-    </ul>
-</nav>
+            </li>
+        </ul>
+    </nav>
 {{end}}

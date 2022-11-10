@@ -3,9 +3,7 @@
     <link rel='stylesheet' href='/static/css/partials/footer.css'>
 {{end}}
 {{define "main"}}
-    <center>
-        <h2>Latest releases</h2><br>
-    </center>
+    <h1>Latest releases</h1>
 
     {{if .Games}}
 
@@ -14,7 +12,7 @@
 
                 <a href="/game/view/{{.ID}}" class="cards__card">
                     <div>
-                        <img src="/static/img/dota_poster.webp" alt="Poster">
+                        <img src="/static/img/no_photo.jpg" alt="Poster">
                     </div>
                     <div class="cards__card__content">
                         <span class="cards__card__game-name">{{.Name}}</span>
