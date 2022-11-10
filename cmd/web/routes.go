@@ -29,8 +29,8 @@ func (app *application) routes() http.Handler {
 
 	protected := dynamic.Append(app.requireAuthentication)
 	router.Handler(http.MethodGet, "/user/view/:id", protected.ThenFunc(app.userView))
-	router.Handler(http.MethodGet, "/snippet/create", protected.ThenFunc(app.gameCreate))
-	router.Handler(http.MethodPost, "/snippet/create", protected.ThenFunc(app.gameCreatePost))
+	router.Handler(http.MethodGet, "/game/create", protected.ThenFunc(app.gameCreate))
+	router.Handler(http.MethodPost, "/game/create", protected.ThenFunc(app.gameCreatePost))
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
