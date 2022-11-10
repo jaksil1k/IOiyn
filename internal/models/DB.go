@@ -24,7 +24,7 @@ func (m *DBModel) CreateTables() error {
     nickname VARCHAR(255) NOT NULL,
 	balance INTEGER NOT NULL,
     email VARCHAR(255) NOT NULL,
-    password CHAR(60) NOT NULL,
+    hashed_password CHAR(60) NOT NULL,
     created DATETIME NOT NULL
 );`
 	createGenreQuery := `CREATE TABLE IF NOT EXISTS genres(

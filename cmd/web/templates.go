@@ -7,12 +7,14 @@ import (
 )
 
 type templateData struct {
-	Game       *models.Game
-	Games      []*models.Game
-	User       *models.User
-	CurrenYear int
-	Form       any
-	Flash      string
+	Game            *models.Game
+	Games           []*models.Game
+	User            *models.User
+	IsAuthenticated bool
+	CurrenYear      int
+	Form            any
+	Flash           string
+	CSRFToken       string
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
