@@ -32,6 +32,7 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/game/create", protected.ThenFunc(app.gameCreate))
 	router.Handler(http.MethodPost, "/game/create", protected.ThenFunc(app.gameCreatePost))
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
+	router.Handler(http.MethodGet, "/user/change_info/:id", protected.ThenFunc(app.changeInfo))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 

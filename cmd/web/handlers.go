@@ -33,6 +33,12 @@ type gameCreateForm struct {
 	validator.Validator `form:"-"`
 }
 
+type userChangeInfoForm struct {
+	Name                string `form:"name"`
+	Nickname            string `form:"nickname"`
+	validator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	games, err := app.games.Latest()
 	if err != nil {
@@ -149,7 +155,6 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	fmt.Println(data.CreatedGames)
 	data.User = user
 
 	app.render(w, http.StatusOK, "userView.tmpl", data)
@@ -253,6 +258,65 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.User = user
+
+	app.render(w, http.StatusOK, "userChangeInfo.tmpl", data)
+}
+
+func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
+	var form userChangeInfoForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 255), "name", "Name field cannot be more than 255 character long")
+	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
+	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 255 character long")
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	err = app.users.Update(id, form.Name, form.Nickname)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
+
+	url := "/user/view/" + string(rune(id))
+
+	http.Redirect(w, r, url, http.StatusSeeOther)
+
 }
 
 //func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {

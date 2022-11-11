@@ -98,6 +98,18 @@ func (m *UserModel) GetById(id int) (*User, error) {
 	return u, nil
 }
 
+func (m *UserModel) Update(id int, name, nickname string) error {
+	stmt := `Update users
+	set name=?, nickname=?
+	where user_id=?`
+
+	_, err := m.DB.Exec(stmt, name, nickname, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *UserModel) CreateInitialUsers() error {
 	name := "Zaur"
 	nickname := "Lagmazavr"
