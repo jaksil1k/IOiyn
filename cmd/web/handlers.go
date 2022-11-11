@@ -44,6 +44,11 @@ type userUpdateBalanceForm struct {
 	validator.Validator `form:"-"`
 }
 
+type userChangePasswordForm struct {
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	games, err := app.games.Latest()
 	if err != nil {
@@ -185,7 +190,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 255 character long")
 	form.CheckField(validator.NotBlank(form.Email), "email", "Email cannot be blank")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	form.CheckField(validator.NotBlank(form.Email), "password", "Password cannot be blank")
+	form.CheckField(validator.NotBlank(form.Password), "password", "Password cannot be blank")
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
 
 	if !form.Valid() {
@@ -272,21 +277,7 @@ func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-
-	user, err := app.users.GetById(id)
-	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			app.notFound(w)
-		} else {
-			app.serverError(w, err)
-		}
-		return
-	}
-
 	data := app.newTemplateData(r)
-	data.User = user
-	user.Password = []byte("")
 	app.render(w, http.StatusOK, "userChangeInfo.tmpl", data)
 }
 
@@ -332,21 +323,7 @@ func (app *application) updateBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-
-	user, err := app.users.GetById(id)
-	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			app.notFound(w)
-		} else {
-			app.serverError(w, err)
-		}
-		return
-	}
-
 	data := app.newTemplateData(r)
-	user.Password = []byte("")
-	data.User = user
 
 	app.render(w, http.StatusOK, "changeBalance.tmpl", data)
 }
@@ -382,6 +359,48 @@ func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, url, http.StatusSeeOther)
 
+}
+
+func (app *application) updatePasswordPut(w http.ResponseWriter, r *http.Request) {
+	var form userChangePasswordForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Password), "password", "Password cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	err = app.users.UpdatePassword(id, form.Password)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
+
+	url := "/user/view/" + string(rune(id))
+
+	http.Redirect(w, r, url, http.StatusSeeOther)
+
+}
+func (app *application) updatePassword(w http.ResponseWriter, r *http.Request) {
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "changeBalance.tmpl", data)
 }
 
 //func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {

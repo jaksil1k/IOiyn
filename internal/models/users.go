@@ -136,6 +136,17 @@ func (m *UserModel) CreateInitialUsers() error {
 	return nil
 }
 
+func (m *UserModel) UpdatePassword(id int, password string) error {
+	stmt := `Update users
+	set hashed_password=?
+	where user_id=?`
+
+	_, err := m.DB.Exec(stmt, password, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (m *UserModel) UserPurchasedGamesView(id int) ([]*Game, error) {
 	stmt := `SELECT * FROM user_purchased_games 
 	where user_purchased_games.game_id=?`
