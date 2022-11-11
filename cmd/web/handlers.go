@@ -41,6 +41,7 @@ type userChangeInfoForm struct {
 
 type userUpdateBalanceForm struct {
 	Balance             int `form:"balance"`
+	CurrentBalance      int `form:"currentBalance"`
 	validator.Validator `form:"-"`
 }
 
@@ -59,6 +60,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data.Games = games
 	app.render(w, http.StatusOK, "home.tmpl", data)
 }
+
 func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
@@ -84,6 +86,7 @@ func (app *application) gameView(w http.ResponseWriter, r *http.Request) {
 
 	app.render(w, http.StatusOK, "gameView.tmpl", data)
 }
+
 func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -217,6 +220,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 
 }
+
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = userLoginForm{}
@@ -259,6 +263,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
 	http.Redirect(w, r, "/game/create", http.StatusSeeOther)
 }
+
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	err := app.sessionManager.RenewToken(r.Context())
 	if err != nil {
@@ -277,7 +282,26 @@ func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
 	data := app.newTemplateData(r)
+	user.Password = []byte("")
+	data.User = user
 	app.render(w, http.StatusOK, "changeInfo.tmpl", data)
 }
 
@@ -322,8 +346,26 @@ func (app *application) updateBalance(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
 
 	data := app.newTemplateData(r)
+	user.Password = []byte("")
+	data.User = user
 
 	app.render(w, http.StatusOK, "changeBalance.tmpl", data)
 }
@@ -348,7 +390,7 @@ func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request)
 
 	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 
-	err = app.users.UpdateBalance(id, form.Balance)
+	err = app.users.UpdateBalance(id, form.Balance, form.CurrentBalance)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -393,6 +435,7 @@ func (app *application) updatePasswordPut(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, url, http.StatusSeeOther)
 
 }
+
 func (app *application) updatePassword(w http.ResponseWriter, r *http.Request) {
 	err := app.sessionManager.RenewToken(r.Context())
 	if err != nil {
@@ -400,7 +443,7 @@ func (app *application) updatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "changeBalance.tmpl", data)
+	app.render(w, http.StatusOK, "changePassword.tmpl", data)
 }
 
 //func (app *application) userCreatePost(w http.ResponseWriter, r *http.Request) {

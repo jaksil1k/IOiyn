@@ -110,12 +110,12 @@ func (m *UserModel) UpdateUserInfo(id int, name, nickname string) error {
 	return nil
 }
 
-func (m *UserModel) UpdateBalance(id, balance int) error {
+func (m *UserModel) UpdateBalance(id, balance, currentBalance int) error {
 	stmt := `Update users
 	set balance=?
 	where user_id=?`
 
-	_, err := m.DB.Exec(stmt, balance, id)
+	_, err := m.DB.Exec(stmt, balance+currentBalance, id)
 	if err != nil {
 		return err
 	}
