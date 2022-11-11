@@ -16,6 +16,8 @@ type templateDate struct {
 	Flash           string
 	CSRFToken       string
 	UserId          int
+	PurchasedGames  []*models.Game
+	CreatedGames    []*models.Game
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

@@ -53,6 +53,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	var id int
 	var hashedPassword []byte
 	stmt := "SELECT user_id, hashed_password FROM users WHERE email = ?"
+
 	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -110,4 +111,55 @@ func (m *UserModel) CreateInitialUsers() error {
 	}
 
 	return nil
+}
+
+func (m *UserModel) UserPurchasedGamesView(id int) ([]*Game, error) {
+	stmt := `SELECT * FROM user_purchased_games 
+	where user_purchased_games.game_id=?`
+	rows, err := m.DB.Query(stmt, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var games []*Game
+
+	for rows.Next() {
+		game := &Game{}
+		err := rows.Scan(&game.ID, &game.CreatedBy, &game.Name, &game.Description, &game.Cost, &game.ReleaseDate, &game.AuthorName)
+		if err != nil {
+			return nil, err
+		}
+		games = append(games, game)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return games, nil
+}
+
+func (m *UserModel) UserCreatedGamesView(id int) ([]*Game, error) {
+	stmt := `SELECT g.game_id, g.created_by, g.name game_name, g.description, g.cost, g.release_year, u.name user_name
+FROM games g JOIN users u ON g.created_by = u.user_id
+where g.created_by=?;`
+	rows, err := m.DB.Query(stmt, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var games []*Game
+
+	for rows.Next() {
+		game := &Game{}
+		err := rows.Scan(&game.ID, &game.CreatedBy, &game.Name, &game.Description, &game.Cost, &game.ReleaseDate, &game.AuthorName)
+		if err != nil {
+			return nil, err
+		}
+		games = append(games, game)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return games, nil
 }
