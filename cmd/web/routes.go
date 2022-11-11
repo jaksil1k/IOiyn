@@ -29,6 +29,7 @@ func (app *application) routes() http.Handler {
 
 	protected := dynamic.Append(app.requireAuthentication)
 	router.Handler(http.MethodGet, "/user/view/:id", protected.ThenFunc(app.userView))
+	router.Handler(http.MethodGet, "/user/another_view/:id", protected.ThenFunc(app.userView))
 	router.Handler(http.MethodGet, "/game/create", protected.ThenFunc(app.gameCreate))
 	router.Handler(http.MethodPost, "/game/create", protected.ThenFunc(app.gameCreatePost))
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))

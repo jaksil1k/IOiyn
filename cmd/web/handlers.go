@@ -147,6 +147,13 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	currentId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	if id != currentId {
+		http.Redirect(w, r, fmt.Sprintf("/user/another_view/%d", id), http.StatusSeeOther)
+		return
+	}
+
 	user, err := app.users.GetById(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -156,6 +163,7 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	user.Password = []byte("")
 
 	data := app.newTemplateData(r)
 	data.PurchasedGames, err = app.users.UserPurchasedGamesView(id)
@@ -171,6 +179,37 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 	data.User = user
 
 	app.render(w, http.StatusOK, "userView.tmpl", data)
+}
+
+func (app *application) anotherUserView(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	user.Password = []byte("")
+
+	data := app.newTemplateData(r)
+	data.CreatedGames, err = app.users.UserCreatedGamesView(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.User = user
+
+	app.render(w, http.StatusOK, "anotherUserView.tmpl", data)
 }
 
 func (app *application) catalogView(w http.ResponseWriter, r *http.Request) {

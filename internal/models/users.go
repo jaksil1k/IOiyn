@@ -133,6 +133,15 @@ func (m *UserModel) CreateInitialUsers() error {
 		return err
 	}
 
+	name = "Zhaksylyk"
+	nickname = "Jaka"
+	balance = 100
+	email = "nartai53@gmail.com"
+	password = "password"
+	err = m.Insert(name, nickname, balance, email, password)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
