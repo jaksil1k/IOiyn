@@ -45,5 +45,13 @@
 .cards div:last-child {
   color: #EA4256;
 }
+.cards .profile-button {
+  background: #EA4256;
+  border: 1px solid #EA4256;
+  color: #F6F6F6;
+  padding: 0.4rem 1rem;
+  width: auto;
+  transition: background-color 0.5s ease;
+}
 
 /*# sourceMappingURL=account.css.map */

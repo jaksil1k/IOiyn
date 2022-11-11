@@ -1,13 +1,14 @@
 {{define "styles"}}
     <link rel="stylesheet" href="/static/css/elements/form-login.css">
+    <link rel="stylesheet" href="/static/css/elements/account.css">
 {{end}}
 
 {{define "main"}}
     <form class="account">
         <ul class="account__list">
             <li class="account__item">
-                <div>Increase tour Balance:</div>
-                <div><input type="number" placeholder="Zaur Berdibekov"></div>
+                <div>Increase tour Balance (current balance: {{.User.Balance}}$:</div>
+                <div><input type="number"></div>
             </li>
             <li class="account__item">
                 <div><input type="submit" value="Save Changes"></div>

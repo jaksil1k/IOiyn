@@ -278,7 +278,7 @@ func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "userChangeInfo.tmpl", data)
+	app.render(w, http.StatusOK, "changeInfo.tmpl", data)
 }
 
 func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {

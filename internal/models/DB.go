@@ -126,7 +126,7 @@ join games g on pg.game_id = g.game_id join users u on pg.user_id = u.user_id;`
 
 func (m *DBModel) DropTables() error {
 	dropPurchased := "DROP TABLE IF EXISTS purchased_games"
-	dropGamesUserIdView := `DROP VIEW games_user_name`
+	dropGamesUserIdView := `DROP VIEW IF EXISTS games_user_name`
 	dropGamesGenres := "DROP TABLE IF EXISTS games_genres"
 	dropGames := "DROP TABLE IF EXISTS games"
 	dropUsers := "DROP TABLE IF EXISTS users"

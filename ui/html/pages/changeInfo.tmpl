@@ -1,5 +1,6 @@
 {{define "styles"}}
     <link rel="stylesheet" href="/static/css/elements/form-login.css">
+    <link rel="stylesheet" href="/static/css/elements/account.css">
 {{end}}
 
 {{define "main"}}
@@ -7,15 +8,15 @@
         <ul class="account__list">
             <li class="account__item">
                 <div>Name:</div>
-                <div><input type="text" placeholder="Zaur Berdibekov"></div>
+                <div><input type="text" placeholder="{{.User.Name}}"></div>
             </li>
             <li class="account__item">
                 <div>Nickname:</div>
-                <div><input type="text" placeholder="zaurito"></div>
+                <div><input type="text" placeholder="{{.User.Nickname}}"></div>
             </li>
             <li class="account__item">
                 <div>Email:</div>
-                <div><input type="text" placeholder="zaurberdibekov@mail.ru"></div>
+                <div><input type="text" placeholder="{{.User.Email}}"></div>
             </li>
             <li class="account__item">
                 <div><input type="submit" value="Save Changes"></div>

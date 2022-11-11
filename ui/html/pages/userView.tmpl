@@ -22,7 +22,7 @@ z{{define "styles"}}
                 </li>
                 <li class="account__item">
                     <div>
-                        <input href="/user/change_info" type="submit" value="Change Info">
+                        <a class="profile-button" href="/user/change_info">Change Info</a>
                     </div>
                 </li>
                 <li class="account__item">
@@ -30,12 +30,10 @@ z{{define "styles"}}
                     <div>{{.Balance}}$</div>
                 </li>
                 <li class="account__item">
-                    <input href="/user/update_balance" type="submit" value="Change Info">
+                    <a class="profile-button" href="/user/update_balance">Up Balance</a>
                 </li>
                 <li class="account__item">
-                    <div>
-                        <input href="/user/change_password" type="submit" value="Change Info">
-                    </div>
+                    <a class="profile-button" href="/user/change_password">Change Password</a>
                 </li>
             </ul>
         </section>
