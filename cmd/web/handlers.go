@@ -39,6 +39,11 @@ type userChangeInfoForm struct {
 	validator.Validator `form:"-"`
 }
 
+type userUpdateBalanceForm struct {
+	Balance             int `form:"balance"`
+	validator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	games, err := app.games.Latest()
 	if err != nil {
@@ -261,13 +266,13 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
-	params := httprouter.ParamsFromContext(r.Context())
-
-	id, err := strconv.Atoi(params.ByName("id"))
-	if err != nil || id < 1 {
-		app.notFound(w)
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
 		return
 	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 
 	user, err := app.users.GetById(id)
 	if err != nil {
@@ -281,7 +286,7 @@ func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.User = user
-
+	user.Password = []byte("")
 	app.render(w, http.StatusOK, "userChangeInfo.tmpl", data)
 }
 
@@ -306,7 +311,67 @@ func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	err = app.users.Update(id, form.Name, form.Nickname)
+
+	err = app.users.UpdateUserInfo(id, form.Name, form.Nickname)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
+
+	url := "/user/view/" + string(rune(id))
+
+	http.Redirect(w, r, url, http.StatusSeeOther)
+
+}
+
+func (app *application) updateBalance(w http.ResponseWriter, r *http.Request) {
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	data := app.newTemplateData(r)
+	user.Password = []byte("")
+	data.User = user
+
+	app.render(w, http.StatusOK, "changeBalance.tmpl", data)
+}
+
+func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request) {
+	var form userUpdateBalanceForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(string(rune(form.Balance))), "balance", "Balance cannot be blank")
+	form.CheckField(validator.MaxInt(form.Balance, 100), "balance", "you cannot take more than 100$ freely")
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	err = app.users.UpdateBalance(id, form.Balance)
 	if err != nil {
 		app.serverError(w, err)
 		return

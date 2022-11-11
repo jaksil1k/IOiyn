@@ -98,7 +98,7 @@ func (m *UserModel) GetById(id int) (*User, error) {
 	return u, nil
 }
 
-func (m *UserModel) Update(id int, name, nickname string) error {
+func (m *UserModel) UpdateUserInfo(id int, name, nickname string) error {
 	stmt := `Update users
 	set name=?, nickname=?
 	where user_id=?`
@@ -110,6 +110,17 @@ func (m *UserModel) Update(id int, name, nickname string) error {
 	return nil
 }
 
+func (m *UserModel) UpdateBalance(id, balance int) error {
+	stmt := `Update users
+	set balance=?
+	where user_id=?`
+
+	_, err := m.DB.Exec(stmt, balance, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (m *UserModel) CreateInitialUsers() error {
 	name := "Zaur"
 	nickname := "Lagmazavr"
