@@ -4,7 +4,10 @@
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 2rem 10rem;
+  padding: 2rem 0;
+}
+.game input[type=submit] {
+  padding: 0;
 }
 .game__info {
   display: flex;
@@ -26,7 +29,7 @@
   width: 100%;
   padding: 2rem;
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 2fr 2fr;
   flex-wrap: wrap;
   column-gap: 3rem;
   row-gap: 3rem;
@@ -42,11 +45,11 @@
   word-wrap: break-word;
 }
 .game__data div p:first-child {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #797878;
 }
 .game__data div p:last-child {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 .game__data div input {
   height: 60%;

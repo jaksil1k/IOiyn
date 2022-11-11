@@ -7,7 +7,9 @@
   align-items: center
   gap: 2rem
   //width: 70%
-  padding: 2rem 10rem
+  padding: 2rem 0
+  input[type=submit]
+    padding: 0
   &__info
     display: flex
     flex-direction: row
@@ -25,7 +27,7 @@
     width: 100%
     padding: 2rem
     display: grid
-    grid-template-columns: 1fr 2fr
+    grid-template-columns: 2fr 2fr
     flex-wrap: wrap
     column-gap: 3rem
     row-gap: 3rem
@@ -38,10 +40,10 @@
       p
         word-wrap: break-word
         &:first-child
-          font-size: 1.2rem
+          font-size: 1rem
           color: #797878
         &:last-child
-          font-size: 2rem
+          font-size: 1.5rem
       input
         height: 60%
   &__description
