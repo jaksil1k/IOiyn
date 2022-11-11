@@ -6,39 +6,40 @@ z{{define "styles"}}
 
     <h1>Your Profile</h1>
     {{with .User}}
-    <section class="account">
-        <ul class="account__list">
-            <li class="account__item">
-                <div>Name:</div>
-                <div>{{.Name}}</div>
-            </li>
-            <li class="account__item">
-                <div>Nickname:</div>
-                <div>{{.Nickname}}</div>
-            </li>
-            <li class="account__item">
-                <div>Email:</div>
-                <div>{{.Email}}</div>
-            </li>
-            <li class="account__item">
-                <div>
-                    <input type="submit" value="Change Info">
-                </div>
-            </li>
-            <li class="account__item">
-                <div>Balance:</div>
-                <div>{{.Balance}}$</div>
-            </li>
-            <li class="account__item">
-                <input type="submit" value="Up the Balance">
-            </li>
-            <li class="account__item">
-                <div>
-                    <input type="submit" value="Change password">
-                </div>
-            </li>
-        </ul>
-    </section>
+        <section class="account">
+            <ul class="account__list">
+                <li class="account__item">
+                    <div>Name:</div>
+                    <div>{{.Name}}</div>
+                </li>
+                <li class="account__item">
+                    <div>Nickname:</div>
+                    <div>{{.Nickname}}</div>
+                </li>
+                <li class="account__item">
+                    <div>Email:</div>
+                    <div>{{.Email}}</div>
+                </li>
+                <li class="account__item">
+                    <div>
+                        <input href="/user/change_info" type="submit" value="Change Info">
+                    </div>
+                </li>
+                <li class="account__item">
+                    <div>Balance:</div>
+                    <div>{{.Balance}}$</div>
+                </li>
+                <li class="account__item">
+                    <input href="/user/update_balance" type="submit" value="Change Info">
+                </li>
+                <li class="account__item">
+                    <div>
+                        <input type="submit" value="Change password">
+                        <input href="/user/change_password" type="submit" value="Change Info">
+                    </div>
+                </li>
+            </ul>
+        </section>
     {{end}}
 
     <section class="cards">
@@ -85,15 +86,15 @@ z{{define "styles"}}
 {{end}}
 
 {{define "footer"}}
-<footer class="footer">
-<ul class="footer__list">
-<li class="footer__item">
-<a href="https://github.com/jaksil1k">
-Site of creator
-</a>
-</li>
-<li class="footer__item">Copyright © 2022 All Rights Reserved</li>
-<li class="footer__item">+7 (777) 777-77-77</li>
-</ul>
-</footer>
+    <footer class="footer">
+        <ul class="footer__list">
+            <li class="footer__item">
+                <a href="https://github.com/jaksil1k">
+                    Site of creator
+                </a>
+            </li>
+            <li class="footer__item">Copyright © 2022 All Rights Reserved</li>
+            <li class="footer__item">+7 (777) 777-77-77</li>
+        </ul>
+    </footer>
 {{end}}
