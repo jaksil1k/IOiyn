@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
+	_ "image/png"
 	"log"
 	"net/http"
 	"os"

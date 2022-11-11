@@ -45,6 +45,11 @@ type userUpdateBalanceForm struct {
 	validator.Validator `form:"-"`
 }
 
+type gamePurchaseForm struct {
+	Balance             int `form:"balance"`
+	validator.Validator `form:"-"`
+}
+
 type userChangePasswordForm struct {
 	Password            string `form:"password"`
 	validator.Validator `form:"-"`
@@ -312,6 +317,47 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) purchaseGame(w http.ResponseWriter, r *http.Request) {
+	var form gamePurchaseForm
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	game, err := app.games.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	//form.CheckField(validator.MaxInt(game.Cost, game.))
+
+	app.users.UpdateBalance(user.ID, -game.Cost, user.Balance)
 }
 
 func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {

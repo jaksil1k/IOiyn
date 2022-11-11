@@ -14,7 +14,8 @@
 
                 {{if .IsAuthenticated}}
                 <form action='/user/logout' method='POST' class="nav__button">
-                    <a >Logout</a>
+                    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+                    <button>Logout</button>
                 </form>
 
                     <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>

@@ -27,7 +27,8 @@
                         <p><a href="/user/view/{{.CreatedBy}}">{{.AuthorName}}</a></p>
                     </div>
                     <div>
-                        <input type="submit" value="Buy ({{.Cost}}$)">
+							<form action="/game/purchase" method="POST">
+                        <input type="submit"  value="Buy ({{.Cost}}$)">
                     </div>
                 </div>
             </div>

@@ -39,6 +39,7 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPut, "/user/update_balance", protected.ThenFunc(app.updateBalancePut))
 	router.Handler(http.MethodGet, "/user/change_password", protected.ThenFunc(app.updatePassword))
 	router.Handler(http.MethodPut, "/user/change_password", protected.ThenFunc(app.updatePasswordPut))
+	router.Handler(http.MethodPost, "/game/purchase/:id", protected.ThenFunc(app.purchaseGame))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
