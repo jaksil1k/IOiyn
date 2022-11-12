@@ -6,7 +6,7 @@
 {{define "main"}}
 
     <section class="game">
-        {{with .Game}}
+        {{if .Game}}
             <div class="game__info">
                 <div class="game__img">
                     <img src="/static/img/no_photo.jpg"
@@ -15,26 +15,28 @@
                 <div class="game__data">
                     <div>
                         <p>Name:</p>
-                        <p>{{.Name}}</p>
+                        <p>{{.Game.Name}}</p>
                     </div>
                     <div>
                         <p>Release Date:</p>
-                        <p>{{.ReleaseDate.Day}}, {{.ReleaseDate.Month}}, {{.ReleaseDate.Year}}</p>
+                        <p>{{.Game.ReleaseDate.Day}}, {{.Game.ReleaseDate.Month}}, {{.Game.ReleaseDate.Year}}</p>
                         {{/*        тут хуман дейт над поменять*/}}
                     </div>
                     <div>
                         <p>Author:</p>
-                        <p><a href="/user/view/{{.CreatedBy}}">{{.AuthorName}}</a></p>
+                        <p><a href="/user/view/{{.Game.CreatedBy}}">{{.Game.AuthorName}}</a></p>
                     </div>
                     <div>
-							<form action="/game/purchase" method="POST">
-                        <input type="submit"  value="Buy ({{.Cost}}$)">
+                        <form action="/game/purchase" method="POST">
+                            <input name='csrf_token' value='{{.CSRFToken}}' type="hidden">
+                            <input type="submit" value="Buy ({{.Game.Cost}}$)">
+                        </form>
                     </div>
                 </div>
             </div>
             <div class="game__description">
                 <h4>Description</h4>
-                {{.Description}}
+                {{.Game.Description}}
 
 
             </div>

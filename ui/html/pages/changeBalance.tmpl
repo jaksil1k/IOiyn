@@ -5,11 +5,13 @@
 
 {{define "main"}}
     <form class="account">
+        <input name='csrf_token' value='{{.CSRFToken}}' type="hidden">
         <ul class="account__list">
             <li class="account__item">
-                <div>Increase tour Balance (current balance: {{.User.Balance}}$:</div>
+                <div>Current balance: {{.User.Balance}}$:</div>
                 <div><input type="number"></div>
             </li>
+            <li></li>
             <li class="account__item">
                 <div><input type="submit" value="Save Changes"></div>
             </li>

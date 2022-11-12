@@ -5,36 +5,38 @@ z{{define "styles"}}
 {{define "main"}}
 
     <h1>Your Profile</h1>
-    {{with .User}}
+    {{if .User}}
         <section class="account">
             <ul class="account__list">
                 <li class="account__item">
                     <div>Name:</div>
-                    <div>{{.Name}}</div>
+                    <div>{{.User.Name}}</div>
                 </li>
                 <li class="account__item">
                     <div>Nickname:</div>
-                    <div>{{.Nickname}}</div>
+                    <div>{{.User.Nickname}}</div>
                 </li>
                 <li class="account__item">
                     <div>Email:</div>
-                    <div>{{.Email}}</div>
+                    <div>{{.User.Email}}</div>
                 </li>
-                <li class="account__item">
-                    <div>
-                        <a class="profile-button" href="/user/change_info">Change Info</a>
-                    </div>
-                </li>
-                <li class="account__item">
-                    <div>Balance:</div>
-                    <div>{{.Balance}}$</div>
-                </li>
-                <li class="account__item">
-                    <a class="profile-button" href="/user/update_balance">Up Balance</a>
-                </li>
-                <li class="account__item">
-                    <a class="profile-button" href="/user/change_password">Change Password</a>
-                </li>
+                {{if eq .User.ID .UserId }}
+                    <li class="account__item">
+                        <div>
+                            <a class="profile-button" href="/user/change_info">Change Info</a>
+                        </div>
+                    </li>
+                    <li class="account__item">
+                        <div>Balance:</div>
+                        <div>{{.User.Balance}}$</div>
+                    </li>
+                    <li class="account__item">
+                        <a class="profile-button" href="/user/update_balance">Up Balance</a>
+                    </li>
+                    <li class="account__item">
+                        <a class="profile-button" href="/user/change_password">Change Password</a>
+                    </li>
+                {{end}}
             </ul>
         </section>
     {{end}}
@@ -72,12 +74,14 @@ z{{define "styles"}}
                     {{end}}
                 </div>
             </li>
-            <li class="cards__item">
-                <div>Bought Games</div>
-            </li>
-            <li class="cards__item">
-                <div>None</div>
-            </li>
+            {{if eq .User.ID .UserId }}
+                <li class="cards__item">
+                    <div>Bought Games</div>
+                </li>
+                <li class="cards__item">
+                    <div>None</div>
+                </li>
+            {{end}}
         </ul>
     </section>
 {{end}}

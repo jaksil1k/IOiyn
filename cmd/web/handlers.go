@@ -152,13 +152,6 @@ func (app *application) userView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-
-	if id != currentId {
-		http.Redirect(w, r, fmt.Sprintf("/user/another_view/%d", id), http.StatusSeeOther)
-		return
-	}
-
 	user, err := app.users.GetById(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
