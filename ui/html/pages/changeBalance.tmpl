@@ -17,6 +17,11 @@
             </li>
         </ul>
     </form>
+    <section class="error">
+        {{with .Form.FieldErrors.balance}}
+            {{.}}
+        {{end}}
+    </section>
 {{end}}
 
 {{define "footer"}}
