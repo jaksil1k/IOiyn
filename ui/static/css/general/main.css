@@ -60,14 +60,19 @@ input[type=submit], input .profile-button, textarea[type=submit], textarea .prof
   background: #EA4256;
   border: 1px solid #EA4256;
   color: #F6F6F6;
-  padding: 0.4rem 1rem;
-  width: auto;
+  padding: 0.5rem 1rem;
+  width: 100%;
   transition: background-color 0.5s ease;
 }
 input[type=submit]:hover, textarea[type=submit]:hover {
   background: transparent;
   border: 1px solid #EA4256;
   color: black;
+}
+
+.profile-button {
+  color: #EA4256;
+  text-decoration: underline;
 }
 
 #hidden-input {

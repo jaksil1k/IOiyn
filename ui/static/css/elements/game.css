@@ -6,9 +6,6 @@
   gap: 2rem;
   padding: 2rem 0;
 }
-.game input[type=submit] {
-  padding: 0;
-}
 .game__info {
   display: flex;
   flex-direction: row;
@@ -50,9 +47,6 @@
 }
 .game__data div p:last-child {
   font-size: 1.5rem;
-}
-.game__data div input {
-  height: 60%;
 }
 .game__description {
   display: flex;

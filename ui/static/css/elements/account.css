@@ -27,6 +27,9 @@
   width: 100%;
   margin: 2rem 0;
   font-size: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 .cards__list {
   text-align: center;
