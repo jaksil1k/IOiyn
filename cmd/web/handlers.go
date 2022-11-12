@@ -392,11 +392,6 @@ func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
-	form.CheckField(validator.MaxChars(form.Name, 255), "name", "Name field cannot be more than 255 character long")
-	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
-	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 255 character long")
-
 	err = app.sessionManager.RenewToken(r.Context())
 	if err != nil {
 		app.serverError(w, err)
@@ -405,6 +400,29 @@ func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
 
 	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 
+	form.CheckField(validator.NotBlank(form.Name), "name", "Name cannot be blank")
+	form.CheckField(validator.MaxChars(form.Name, 255), "name", "Name field cannot be more than 255 character long")
+	form.CheckField(validator.NotBlank(form.Nickname), "nickname", "Nickname cannot be blank")
+	form.CheckField(validator.MaxChars(form.Nickname, 255), "nickname", "Nickname field cannot be more than 255 character long")
+
+	if !form.Valid() {
+		user, err := app.users.GetById(id)
+		if err != nil {
+			if errors.Is(err, models.ErrNoRecord) {
+				app.notFound(w)
+			} else {
+				app.serverError(w, err)
+			}
+			return
+		}
+		data := app.newTemplateData(r)
+		user.Password = []byte("")
+		data.Form = form
+		data.User = user
+		app.render(w, http.StatusUnprocessableEntity, "changeInfo.tmpl", data)
+		return
+	}
+
 	err = app.users.UpdateUserInfo(id, form.Name, form.Nickname)
 	if err != nil {
 		app.serverError(w, err)
@@ -412,9 +430,9 @@ func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
 	}
 	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
 
-	url := "/user/view/" + string(rune(id))
+	//url := "/user/view/" + string(rune(id))
 
-	http.Redirect(w, r, url, http.StatusSeeOther)
+	http.Redirect(w, r, "/user/view/"+string(id), http.StatusSeeOther)
 
 }
 
@@ -460,6 +478,13 @@ func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request)
 	form.CheckField(validator.NotBlank(string(rune(form.Balance))), "balance", "Balance cannot be blank")
 	form.CheckField(validator.MaxInt(form.Balance, 100), "balance", "you cannot take more than 100$ freely")
 
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "changeBalance.tmpl", data)
+		return
+	}
+
 	err = app.sessionManager.RenewToken(r.Context())
 	if err != nil {
 		app.serverError(w, err)
@@ -492,6 +517,13 @@ func (app *application) updatePasswordPut(w http.ResponseWriter, r *http.Request
 
 	form.CheckField(validator.NotBlank(form.Password), "password", "Password cannot be blank")
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password cannot be less than 8")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "changeBalance.tmpl", data)
+		return
+	}
 
 	err = app.sessionManager.RenewToken(r.Context())
 	if err != nil {
