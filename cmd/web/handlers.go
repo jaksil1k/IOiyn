@@ -52,6 +52,7 @@ type gamePurchaseForm struct {
 
 type userChangePasswordForm struct {
 	Password            string `form:"password"`
+	RePassword          string `form:"rePassword"`
 	validator.Validator `form:"-"`
 }
 
@@ -378,6 +379,7 @@ func (app *application) changeInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
+	data.Form = userLoginForm{}
 	user.Password = []byte("")
 	data.User = user
 	app.render(w, http.StatusOK, "changeInfo.tmpl", data)
@@ -432,7 +434,7 @@ func (app *application) changeInfoPut(w http.ResponseWriter, r *http.Request) {
 
 	//url := "/user/view/" + string(rune(id))
 
-	http.Redirect(w, r, "/user/view/"+string(id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
 
 }
 
@@ -460,6 +462,7 @@ func (app *application) updateBalance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
+	data.Form = userUpdateBalanceForm{}
 	user.Password = []byte("")
 	data.User = user
 
@@ -475,15 +478,7 @@ func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	form.CheckField(validator.NotBlank(string(rune(form.Balance))), "balance", "Balance cannot be blank")
-	form.CheckField(validator.MaxInt(form.Balance, 100), "balance", "you cannot take more than 100$ freely")
-
-	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity, "changeBalance.tmpl", data)
-		return
-	}
+	form.CheckField(validator.MaxInt(form.Balance, 10000), "balance", "you cannot take more than 100$ freely")
 
 	err = app.sessionManager.RenewToken(r.Context())
 	if err != nil {
@@ -493,16 +488,35 @@ func (app *application) updateBalancePut(w http.ResponseWriter, r *http.Request)
 
 	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 
-	err = app.users.UpdateBalance(id, form.Balance, form.CurrentBalance)
+	user, err := app.users.GetById(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	user.Password = []byte("")
+
+	if !form.Valid() {
+
+		data := app.newTemplateData(r)
+		data.User = user
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "changeBalance.tmpl", data)
+		return
+	}
+
+	fmt.Println(form.Balance, " ", user.Balance)
+	err = app.users.UpdateBalance(id, form.Balance, user.Balance)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
 
-	url := "/user/view/" + string(rune(id))
-
-	http.Redirect(w, r, url, http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
 
 }
 
@@ -540,9 +554,7 @@ func (app *application) updatePasswordPut(w http.ResponseWriter, r *http.Request
 	}
 	app.sessionManager.Put(r.Context(), "flash", "Your update was successful.")
 
-	url := "/user/view/" + string(rune(id))
-
-	http.Redirect(w, r, url, http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/user/view/%d", id), http.StatusSeeOther)
 
 }
 
@@ -553,6 +565,7 @@ func (app *application) updatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := app.newTemplateData(r)
+	data.Form = userChangePasswordForm{}
 	app.render(w, http.StatusOK, "changePassword.tmpl", data)
 }
 
