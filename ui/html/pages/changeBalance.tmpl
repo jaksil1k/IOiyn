@@ -4,7 +4,7 @@
 {{end}}
 
 {{define "main"}}
-    <form class="account">
+    <form class="account" action="/user/update_balance" method="POST">
         <input name='csrf_token' value='{{.CSRFToken}}' type="hidden">
         <ul class="account__list">
             <li class="account__item">
