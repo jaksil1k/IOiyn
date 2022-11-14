@@ -12,6 +12,7 @@ type Game struct {
 	Name        string
 	Description string
 	Cost        int
+	ImageName   string
 	ReleaseDate time.Time
 	AuthorName  string
 }
@@ -20,11 +21,11 @@ type GameModel struct {
 	DB *sql.DB
 }
 
-func (m *GameModel) Insert(createdBy int, name string, description string, cost int, releaseYear time.Time) (int, error) {
-	stmt := `insert into games(created_by, name, description, cost, release_year)
-	Values(?, ?, ?, ?, ?)`
+func (m *GameModel) Insert(createdBy int, name string, description string, cost int, imageName string, releaseYear time.Time) (int, error) {
+	stmt := `insert into games(created_by, name, description, cost, image_name, release_year)
+	Values(?, ?, ?, ?, ?, ?)`
 
-	result, err := m.DB.Exec(stmt, createdBy, name, description, cost, releaseYear)
+	result, err := m.DB.Exec(stmt, createdBy, name, description, cost, imageName, releaseYear)
 
 	if err != nil {
 		return 0, err
@@ -39,7 +40,7 @@ func (m *GameModel) Insert(createdBy int, name string, description string, cost 
 }
 
 func (m *GameModel) GetById(id int) (*Game, error) {
-	stmt := `SELECT g.game_id, g.created_by, g.name , g.description, g.cost, g.release_year, u.name user_name
+	stmt := `SELECT g.game_id, g.created_by, g.name , g.description, g.cost, g.image_name, g.release_year, u.name user_name
 FROM games g JOIN users u ON g.created_by = u.user_id
 WHERE g.game_id = ?;`
 
@@ -47,7 +48,7 @@ WHERE g.game_id = ?;`
 
 	g := &Game{}
 
-	err := row.Scan(&g.ID, &g.CreatedBy, &g.Name, &g.Description, &g.Cost, &g.ReleaseDate, &g.AuthorName)
+	err := row.Scan(&g.ID, &g.CreatedBy, &g.Name, &g.Description, &g.Cost, &g.ImageName, &g.ReleaseDate, &g.AuthorName)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -74,7 +75,7 @@ func (m *GameModel) Latest() ([]*Game, error) {
 
 	for rows.Next() {
 		game := &Game{}
-		err := rows.Scan(&game.ID, &game.CreatedBy, &game.Name, &game.Description, &game.Cost, &game.ReleaseDate, &game.AuthorName)
+		err := rows.Scan(&game.ID, &game.CreatedBy, &game.Name, &game.Description, &game.Cost, &game.ImageName, &game.ReleaseDate, &game.AuthorName)
 		if err != nil {
 			return nil, err
 		}
@@ -89,15 +90,15 @@ func (m *GameModel) Latest() ([]*Game, error) {
 }
 
 func (m *GameModel) CreateInitialGames() error {
-	_, err := m.Insert(1, "dota", "kind of shit", 0, time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
+	_, err := m.Insert(1, "dota", "kind of shit", 0, "no_photo.jpg", time.Date(2012, time.July, 9, 0, 0, 0, 0, time.UTC))
 	if err != nil {
 		return err
 	}
-	_, err = m.Insert(1, "cs go", "simple гений", 0, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
+	_, err = m.Insert(1, "cs go", "simple гений", 0, "no_photo.jpg", time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
 	if err != nil {
 		return err
 	}
-	_, err = m.Insert(1, "the last of us", "THE BEST GAME", 20, time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
+	_, err = m.Insert(1, "the last of us", "THE BEST GAME", 20, "no_photo.jpg", time.Date(2012, time.August, 21, 0, 0, 0, 0, time.UTC))
 	if err != nil {
 		return err
 	}

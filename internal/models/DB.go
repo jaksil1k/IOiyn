@@ -15,6 +15,7 @@ func (m *DBModel) CreateTables() error {
     name VARCHAR(255) NOT NULL,
 	description TEXT NOT NULL,
     cost INTEGER NOT NULL,
+    image_name VARCHAR(255) NOT NULL DEFAULT 'no_photo.jpg',
     release_year DATE NOT NULL,
     FOREIGN KEY (created_by) REFERENCES users(user_id)
 );`
@@ -52,7 +53,7 @@ func (m *DBModel) CreateTables() error {
 	userEmailConstraint := `ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);`
 
 	gamesUsersName := `CREATE OR REPLACE VIEW games_user_name AS
-SELECT g.game_id, g.created_by, g.name game_name, g.description, g.cost, g.release_year, u.name user_name
+SELECT g.game_id, g.created_by, g.name game_name, g.description, g.cost, g.image_name, g.release_year, u.name user_name
 FROM games g JOIN users u ON g.created_by = u.user_id;
 `
 	userPurchasedGames := `create or replace view user_purchased_games as
