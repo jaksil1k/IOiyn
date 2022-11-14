@@ -21,8 +21,8 @@ type application struct {
 	errorLog       *log.Logger
 	infoLog        *log.Logger
 	games          *models.GameModel
-	db             *models.DBModel
 	users          *models.UserModel
+	purchasedGames *models.PurchasedGamesModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -67,7 +67,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-
+	modelPurchasedGames := models.PurchasedGamesModel{DB: db}
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
@@ -84,6 +84,7 @@ func main() {
 		infoLog:        infoLog,
 		games:          &modelGame,
 		users:          &modelUser,
+		purchasedGames: &modelPurchasedGames,
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,

@@ -27,7 +27,7 @@
                         <p><a href="/user/view/{{.Game.CreatedBy}}">{{.Game.AuthorName}}</a></p>
                     </div>
                     <div>
-                        <form action="/game/purchase" method="POST">
+                        <form action="/game/purchase/{{.Game.ID}}" method="POST">
                             <input name='csrf_token' value='{{.CSRFToken}}' type="hidden">
                             <input type="submit" value="Buy ({{.Game.Cost}}$)">
                         </form>

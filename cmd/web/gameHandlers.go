@@ -68,13 +68,35 @@ func (app *application) purchaseGame(w http.ResponseWriter, r *http.Request) {
 
 	params := httprouter.ParamsFromContext(r.Context())
 
-	id, err := strconv.Atoi(params.ByName("id"))
-	if err != nil || id < 1 {
+	gameId, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || gameId < 1 {
 		app.notFound(w)
 		return
 	}
 
-	game, err := app.games.GetById(id)
+	game, err := app.games.GetById(gameId)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+	if err != nil || userId < 1 {
+		app.notFound(w)
+		return
+	}
+
+	user, err := app.users.GetById(userId)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
@@ -84,43 +106,32 @@ func (app *application) purchaseGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := app.users.GetById(id)
-	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			app.notFound(w)
-		} else {
-			app.serverError(w, err)
-		}
+	isExists, err := app.purchasedGames.IsExists(gameId, userId)
+
+	form.CheckField(validator.MaxInt(game.Cost, user.Balance), "notEnoughBalance", "You don't have enough money")
+	form.CheckField(isExists, "alreadyPurchased", "You already have purchased this game")
+	if !form.Valid() {
+		user.Password = []byte("")
+		game.AuthorName = user.Name
+		data := app.newTemplateData(r)
+		data.Game = game
+		app.render(w, http.StatusOK, "gameView.tmpl", data)
 		return
 	}
 
-	//form.CheckField(validator.MaxInt(game.Cost, game.))
-
-	app.users.UpdateBalance(user.ID, -game.Cost, user.Balance)
-}
-
-func reverse(s string) string {
-	rns := []rune(s) // convert to rune
-	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
-
-		// swap the letters of the string,
-		// like first with last and so on.
-		rns[i], rns[j] = rns[j], rns[i]
+	err = app.users.UpdateBalance(user.ID, -game.Cost, user.Balance)
+	if err != nil {
+		return
 	}
 
-	// return the reversed string.
-	return string(rns)
-}
-
-func getImageName(imagePath string) string {
-	imageName := ""
-	for i := len(imagePath) - 1; i >= 0; i-- {
-		if imagePath[i] == '\\' {
-			break
-		}
-		imageName += string(rune(imagePath[i]))
+	err = app.users.UpdateBalance(game.CreatedBy, game.Cost, user.Balance)
+	if err != nil {
+		return
 	}
-	return reverse(imageName)
+
+	app.sessionManager.Put(r.Context(), "flash", "Game successfully created!")
+
+	http.Redirect(w, r, fmt.Sprintf("/game/user/%d", userId), http.StatusSeeOther)
 }
 
 func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -128,8 +139,7 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	file, _, err := r.FormFile("image")
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		app.serverError(w, err)
 		return
 	}
 
@@ -172,7 +182,7 @@ func (app *application) gameCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.games.Insert(app.sessionManager.GetInt(r.Context(), "authenticatedUserID"), form.Name, form.Description, form.Cost, getImageName(tempFile.Name()), time.Now())
+	id, err := app.games.Insert(app.sessionManager.GetInt(r.Context(), "authenticatedUserID"), form.Name, form.Description, form.Cost, app.getImageName(tempFile.Name()), time.Now())
 	if err != nil {
 		app.serverError(w, err)
 		return
